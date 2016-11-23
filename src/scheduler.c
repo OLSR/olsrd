@@ -59,6 +59,11 @@
 #include <assert.h>
 #include <time.h>
 
+#ifdef __APPLE__
+#include <mach/clock.h>
+#include <mach/mach.h>
+#endif /* __APPLE__ */
+
 #ifdef _WIN32
 #define close(x) closesocket(x)
 #endif /* _WIN32 */
@@ -129,18 +134,30 @@ static int avl_comp_timer(const void *entry1, const void *entry2) {
 uint32_t
 olsr_times(void)
 {
+  uint64_t nsec;
   struct timespec tv;
 
+#ifdef __APPLE__
+  clock_serv_t cclock;
+  mach_timespec_t mts;
+
+  host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &cclock);
+  clock_get_time(cclock, &mts);
+  mach_port_deallocate(mach_task_self(), cclock);
+  tv.tv_sec = mts.tv_sec;
+  tv.tv_nsec = mts.tv_nsec;
+#else
   if (clock_gettime(CLOCK_MONOTONIC, &tv) != 0) {
     olsr_exit("OS clock is not working, have to shut down OLSR", EXIT_FAILURE);
   }
+#endif /* __APPLE__ */
+
 
   /* test if time jumped backward or more than 60 seconds forward */
   if ((tv.tv_sec < last_tv.tv_sec) //
       || ((tv.tv_sec == last_tv.tv_sec) //
           && tv.tv_nsec < last_tv.tv_nsec) //
       || ((tv.tv_sec - last_tv.tv_sec) > 60)) {
-    uint64_t nsec;
 
     OLSR_PRINTF(1, "Time jump (%ld.%09ld to %ld.%09ld)\n", //
         (long int) last_tv.tv_sec,//
@@ -160,6 +177,7 @@ olsr_times(void)
       first_tv.tv_nsec += 1000000000;
     }
     last_tv = tv;
+
     return (nsec / 1000000);
   }
 
@@ -628,9 +646,20 @@ olsr_init_timers(void)
   OLSR_PRINTF(3, "Initializing scheduler.\n");
 
   /* Grab initial timestamp */
+#ifdef __APPLE__
+  clock_serv_t cclock;
+  mach_timespec_t mts;
+
+  host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &cclock);
+  clock_get_time(cclock, &mts);
+  mach_port_deallocate(mach_task_self(), cclock);
+  first_tv.tv_sec = mts.tv_sec;
+  first_tv.tv_nsec = mts.tv_nsec;
+#else
   if (clock_gettime(CLOCK_MONOTONIC, &first_tv)) {
     olsr_exit("OS clock is not working, have to shut down OLSR", EXIT_FAILURE);
   }
+#endif /* __APPLE__ */
   last_tv = first_tv;
   now_times = olsr_times();
 
