@@ -84,7 +84,7 @@ static bool nameservice_configured = false;
 /* config parameters */
 static char my_hosts_file[MAX_FILE + 1];
 static char my_sighup_pid_file[MAX_FILE + 1];
-static int my_sighup_interval = 5;
+static int my_filewrite_interval = 5;
 
 static char my_add_hosts[MAX_FILE + 1];
 static char my_suffix[MAX_SUFFIX];
@@ -269,7 +269,7 @@ static const struct olsrd_plugin_parameters plugin_parameters[] = {
   { .name = "interval",               .set_plugin_parameter = &set_plugin_int,         .data = &my_interval },
   { .name = "timeout",                .set_plugin_parameter = &set_nameservice_float,  .data = &my_timeout },
   { .name = "sighup-pid-file",        .set_plugin_parameter = &set_plugin_string,      .data = &my_sighup_pid_file,        .addon = {sizeof(my_sighup_pid_file)} },
-  { .name = "sighup-interval",        .set_plugin_parameter = &set_plugin_int,         .data = &my_sighup_interval },
+  { .name = "filewrite-interval",     .set_plugin_parameter = &set_plugin_int,         .data = &my_filewrite_interval },
   { .name = "hosts-file",             .set_plugin_parameter = &set_plugin_string,      .data = &my_hosts_file,             .addon = {sizeof(my_hosts_file)} },
   { .name = "name-change-script",     .set_plugin_parameter = &set_plugin_string,      .data = &my_name_change_script,     .addon = {sizeof(my_name_change_script)} },
   { .name = "services-change-script", .set_plugin_parameter = &set_plugin_string,      .data = &my_services_change_script, .addon = {sizeof(my_services_change_script)} },
@@ -565,7 +565,7 @@ olsr_start_write_file_timer(void)
     return;
   }
 
-  write_file_timer = olsr_start_timer(my_sighup_interval * MSEC_PER_SEC, 5, OLSR_TIMER_ONESHOT, olsr_expire_write_file_timer, NULL, 0);
+  write_file_timer = olsr_start_timer(my_filewrite_interval * MSEC_PER_SEC, 5, OLSR_TIMER_ONESHOT, olsr_expire_write_file_timer, NULL, 0);
 }
 
 /*
