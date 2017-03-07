@@ -54,6 +54,7 @@ HDRS +=		$(wildcard src/win32/*.h)
 CPPFLAGS += 	-D_WIN32_WINNT=0x0600
 LIBS +=		-lws2_32 -liphlpapi
 CPPFLAGS += 	-I$(TOPDIR)/src/win32
+CPPFLAGS += -I$(TOPDIR)/contrib/regex
 
 PLUGIN_SONAME ?= $(PLUGIN_NAME)
 PLUGIN_FULLNAME ?= $(PLUGIN_NAME).dll
@@ -204,6 +205,18 @@ gui/win32/Main/olsrd_cfgparser.lib: cfgparser
 		@# Use the Microsoft Lib Tool instead
 		PATH=$(MSVCCYG)/VC98/Bin:$$PATH && LIB.EXE \
 			/machine:i386 /def:src/cfgparser/olsrd_cfgparser.def /out:gui/win32/Main/olsrd_cfgparser.lib
+
+# Use the Android regex for Win32 as well
+REGEX_LIB = $(TOPDIR)/contrib/regex/regex/libregex.a
+REGEX_CLEAN = regex_clean
+$(REGEX_LIB):
+	$(MAKECMDPREFIX)$(MAKE) MAKECMDPREFIX="$(MAKECMDPREFIX)" -C $(TOPDIR)/contrib/regex/regex/ REGEX_LIB=$(REGEX_LIB) VERBOSE=$(VERBOSE) \
+		CROSS_COMPILE="$(CROSS_COMPILE)" \
+		CC="$(CC)" LD="$(LD)" AR="$(AR)" STRIP="$(STRIP)" \
+		CPPFLAGS="$(CPPFLAGS)"
+
+$(REGEX_CLEAN):
+	$(MAKECMDPREFIX)$(MAKE) MAKECMDPREFIX="$(MAKECMDPREFIX)" -C $(TOPDIR)/contrib/regex/regex/ clean REGEX_LIB=$(REGEX_LIB)
 
 # Local Variables:
 # mode: makefile

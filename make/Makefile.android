@@ -94,6 +94,7 @@ CPPFLAGS +=	-D'IPTOS_PREC(tos)=((tos)&0xe0)'
 CPPFLAGS +=	-D'IPTOS_TOS(tos)=((tos)&0x1e)'
 # Android NDK is missing some Linux headers and regex, we have them here:
 CPPFLAGS += -I$(TOPDIR)/android
+CPPFLAGS += -I$(TOPDIR)/contrib/regex
 
 # Compilation flags from build/toolchains/arm-eabi-4.2.1/setup.mk
 #  * removed -fstrict-aliasing since the code has a lot of type-punning
@@ -143,10 +144,10 @@ STRIP = $(CROSS_COMPILE)strip
 endif
 
 # Android didn't add regex until android-8 so include this one
-REGEX_LIB = $(TOPDIR)/android/regex/libregex.a
+REGEX_LIB = $(TOPDIR)/contrib/regex/regex/libregex.a
 REGEX_CLEAN = regex_clean
 $(REGEX_LIB):
-	$(MAKECMDPREFIX)$(MAKE) MAKECMDPREFIX="$(MAKECMDPREFIX)" -C $(TOPDIR)/android/regex/ REGEX_LIB=$(REGEX_LIB) VERBOSE=$(VERBOSE) \
+	$(MAKECMDPREFIX)$(MAKE) MAKECMDPREFIX="$(MAKECMDPREFIX)" -C $(TOPDIR)/contrib/regex/regex/ REGEX_LIB=$(REGEX_LIB) VERBOSE=$(VERBOSE) \
 		NDK_TOOLCHAIN_BASE="$(NDK_TOOLCHAIN_BASE)" \
 		NDK_PLATFORM_VERSION="$(NDK_PLATFORM_VERSION)" \
 		NDK_SYSROOT="$(NDK_SYSROOT)" \
@@ -155,7 +156,7 @@ $(REGEX_LIB):
 		CPPFLAGS="$(CPPFLAGS)"
 
 $(REGEX_CLEAN):
-	$(MAKECMDPREFIX)$(MAKE) MAKECMDPREFIX="$(MAKECMDPREFIX)" -C $(TOPDIR)/android/regex/ clean REGEX_LIB=$(REGEX_LIB)
+	$(MAKECMDPREFIX)$(MAKE) MAKECMDPREFIX="$(MAKECMDPREFIX)" -C $(TOPDIR)/contrib/regex/regex/ clean REGEX_LIB=$(REGEX_LIB)
 
 # Local Variables:
 # mode: makefile

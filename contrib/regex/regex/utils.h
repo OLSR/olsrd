@@ -53,3 +53,7 @@ typedef unsigned char uch;
 #ifdef USEBCOPY
 #define	memmove(d, s, c)	bcopy(s, d, c)
 #endif
+
+#ifdef _WIN32
+size_t strlcpy(char *dst, const char *src, size_t siz);
+#endif

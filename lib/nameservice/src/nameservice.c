@@ -159,8 +159,8 @@ name_constructor(void)
 
   len = strlen(my_hosts_file);
   if (my_hosts_file[len - 1] != '\\')
-    strscat(my_hosts_file, "\\", sizeof(my_host_file));
-  strscat(my_hosts_file, "hosts_olsr", sizeof(my_host_file));
+    strscat(my_hosts_file, "\\", sizeof(my_hosts_file));
+  strscat(my_hosts_file, "hosts_olsr", sizeof(my_hosts_file));
 
   len = strlen(my_services_file);
   if (my_services_file[len - 1] != '\\')

@@ -1,4 +1,7 @@
 SRC = regcomp.c regerror.c regexec.c regfree.c 
+ifeq ($(OS), win32)
+SRC += strlcpy.c
+endif
 OBJ = $(SRC:.c=.o)
 INCLUDES = -I. -I..
 
