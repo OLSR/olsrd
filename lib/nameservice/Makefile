@@ -45,19 +45,22 @@ OLSRD_PLUGIN =	true
 PLUGIN_NAME =	olsrd_nameservice
 PLUGIN_VER =	0.4
 
-TOPDIR = ../..
+# MinGW "ar" has problems with relative paths (used for libregex.a)
+TOPDIR = $(realpath ../..)
 include $(TOPDIR)/Makefile.inc
 
-ifeq ($(OS),win32)
-default_target install clean:
-	@echo "**** We use the regex library here. Does Win32 has something like this?"
-else
 ifeq ($(OS),android)
 # On Android Google forgot to include regex engine code for Froyo version (but also there was
 # no support in older versions for it) so we have here this missing code.
 # http://groups.google.com/group/android-ndk/browse_thread/thread/5ea6f0650f0e3fc
 OBJS +=     $(REGEX_LIB)
 CFLAGS += -D__POSIX_VISIBLE
+endif
+ifeq ($(OS),win32)
+# Win32 lacks regex as well
+OBJS +=     $(REGEX_LIB)
+CFLAGS += -D__POSIX_VISIBLE
+#CPPFLAGS += -I$(TOPDIR)/contrib/regex
 endif
 
 default_target: $(PLUGIN_FULLNAME)
@@ -77,4 +80,3 @@ uninstall:
 
 clean:		$(REGEX_CLEAN)
 		rm -f $(OBJS) $(SRCS:%.c=%.d) $(PLUGIN_FULLNAME)
-endif

@@ -268,6 +268,17 @@ mapwrite_exit(void)
     the_fifoname = 0;
   }
 }
+#else /* _WIN32 */
+/* TODO: Something better */
+int mapwrite_init(const char *fifoname)
+{
+  (void)fifoname; /* suppress "unused" warning */
+  return true;
+}
+
+void mapwrite_exit(void)
+{
+}
 #endif /* _WIN32 */
 
 /*

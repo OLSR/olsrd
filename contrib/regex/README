@@ -1,0 +1,5 @@
+Missing regex lib for Android and Win32.
+
+Android: regex support was not added until NDK platform android-8 (v2.2)
+
+Win32: Missing "strlcpy" added via strlcpy.c and utils.h

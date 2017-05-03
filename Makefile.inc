@@ -253,6 +253,9 @@ endif
 LDFLAGS +=	-Wl,-rpath,$(LIBDIR)
 endif
 # LDFLAGS for all 
+ifeq ($(OS),win32)
+  LDFLAGS +=	-static-libgcc -static-libstdc++
+endif
 LDFLAGS +=	-Wl,--warn-common
 # See above at "-ffunction-sections" for an explanation (and why it is disabled).
 #LDOPTS +=	-Wl,--gc-sections
