@@ -78,10 +78,6 @@
 
 #include "olsrd_drophna.h"
 
-
-char * get_ipv4_str(uint32_t address, char *s, size_t maxlen);
-char * get_ipv6_str(unsigned char* address, char *s, size_t maxlen);
-
 /* -------------------------------------------------------------------------
  * Function   : olsr_blacklist_parser
  * Description: Function to be passed to the parser engine. This function
@@ -182,48 +178,6 @@ olsrd_drophna_parser(
     }
   }
 	return true;
-}
-
-/* -------------------------------------------------------------------------
- * Function   : get_ipv4_str
- * Description: Convert the specified address to an IPv4 compatible string
- * Input      : address - IPv4 address to convert to string
- *              s       - string buffer to contain the resulting string
- *              maxlen  - maximum length of the string buffer
- * Output     : none
- * Return     : Pointer to the string buffer containing the result
- * Data Used  : none
- * ------------------------------------------------------------------------- */
-char *
-get_ipv4_str(uint32_t address, char *s, size_t maxlen)
-{
-  struct sockaddr_in v4;
-
-  v4.sin_addr.s_addr = address;
-  inet_ntop(AF_INET, &v4.sin_addr, s, maxlen);
-
-  return s;
-}
-
-/* -------------------------------------------------------------------------
- * Function   : get_ipv6_str
- * Description: Convert the specified address to an IPv4 compatible string
- * Input      : address - IPv6 address to convert to string
- *              s       - string buffer to contain the resulting string
- *              maxlen  - maximum length of the string buffer
- * Output     : none
- * Return     : Pointer to the string buffer containing the result
- * Data Used  : none
- * ------------------------------------------------------------------------- */
-char *
-get_ipv6_str(unsigned char* address, char *s, size_t maxlen)
-{
-  struct sockaddr_in6 v6;
-
-  memcpy(v6.sin6_addr.s6_addr, address, sizeof(v6.sin6_addr.s6_addr));
-  inet_ntop(AF_INET6, &v6.sin6_addr, s, maxlen);
-
-  return s;
 }
 
 void olsrd_drophna_init() {
