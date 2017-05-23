@@ -47,10 +47,15 @@
 #include "defs.h"
 #include "olsrd_drophna.h"
 
+/* Parser function to register with the scheduler */
+bool olsrd_drophna_parser(
+    union olsr_message *,
+    struct interface *,
+    union olsr_ip_addr *
+    );
+
 int olsrd_plugin_init(void) {
-  olsr_parser_add_function(&olsrd_blacklist_parser, HELLO_MESSAGE);
-  olsr_parser_add_function(&olsrd_blacklist_parser, LQ_HELLO_MESSAGE);
-  fprintf(stderr, "foobarbaz\n");
+  olsr_parser_add_function(&olsrd_drophna_parser, HNA_MESSAGE);
   return 0;
 }
 void olsr_plugin_exit(void) {}
@@ -62,7 +67,6 @@ static void
 my_init(void)
 {
   /* Print plugin info to stdout */
-  fprintf(stderr, "fuz");
   printf("%s\n", MOD_DESC);
   //olsrd_blacklist_init();
 }

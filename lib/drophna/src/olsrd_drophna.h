@@ -39,8 +39,8 @@
  */
 
 
-#ifndef _BLACKLIST_H
-#define _BLACKLIST_H
+#ifndef _DROPHNA_H
+#define _DROPHNA_H
 
 #include "olsr_types.h" //for the fucking bool
 #include "lq_packet.h"
@@ -54,15 +54,9 @@
 
 void olsrd_drophna_init();
 
-/* Parser function to register with the scheduler */
-bool olsrd_blacklist_parser(
-    union olsr_message *,
-    struct interface *,
-    union olsr_ip_addr *
-    );
 
 
-#endif /* _BLACKLIST_H */
+#endif /* _DROPHNA_H*/
 
 /*
  * Local Variables:
