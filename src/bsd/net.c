@@ -55,6 +55,7 @@
 #include "ipcalc.h"
 #include "parser.h"          /* dnc: needed for call to packet_parser() */
 #include "olsr_protocol.h"
+#include "olsr_random.h"
 #include "olsr_cfg.h"
 #include "olsr.h"
 
