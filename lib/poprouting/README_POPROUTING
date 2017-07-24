@@ -1,0 +1,28 @@
+============
+INTRODUCTION
+============
+
+The netjson plugin is not an info plugin, but it uses the info structure to allow communication.
+It is used to set the values of the Hello and the TC timers in olsr.
+
+Please first read what's written in the file lib/info/README_INFO.
+
+
+==================
+SUPPORTED COMMANDS
+==================
+
+* /HelloTimer=%d
+* /TCTimer=
+====================
+PLUGIN CONFIGURATION
+====================
+
+The plugin is configured with the generic info plugin configuration parameters.
+
+The port in the generic info plugin configuration is set to 2005.
+
+LoadPlugin "olsrd_poprouting.so.0.1"
+{
+  # <generic info plugin configuration>
+}

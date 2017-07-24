@@ -514,6 +514,12 @@ static void send_info(const char * req, bool add_headers, unsigned int send_what
       };
 
       send_info_from_table(&abuf, send_what, funcs, ARRAY_SIZE(funcs), &outputLength);
+    } else if(send_what & SIW_POPROUTING){
+      SiwLookupTableEntry funcs[] = {
+        { SIW_POPROUTING_TC               , functions->TcTimer           }, //
+        { SIW_POPROUTING_HELLO            , functions->HelloTimer        } //
+      };
+
     } else if ((send_what & SIW_OLSRD_CONF) && functions->olsrd_conf) {
       /* this outputs the olsrd.conf text directly, not normal format */
       unsigned int preLength = abuf.len;

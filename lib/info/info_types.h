@@ -116,6 +116,11 @@ typedef struct {
 /* everything */
 #define SIW_EVERYTHING                   ((SIW_NETJSON_NETWORK_COLLECTION << 1) - 1)
 
+/*poprouting */
+#define SIW_POPROUTING_HELLO             (1ULL << 20)
+#define SIW_POPROUTING_TC                (1ULL << 21)
+#define SIW_POPROUTING                   (SIW_POPROUTING_TC | SIW_POPROUTING_HELLO)
+
 /* command prefixes */
 #define SIW_PREFIX_HTTP                  "/http"
 #define SIW_PREFIX_HTTP_LEN              (sizeof(SIW_PREFIX_HTTP) - 1)
@@ -163,6 +168,9 @@ typedef struct {
     printer_generic deviceConfiguration;
     printer_generic deviceMonitoring;
     printer_generic networkCollection;
+    printer_generic TcTimer;
+    printer_generic HelloTimer;
+
 } info_plugin_functions_t;
 
 struct info_cache_entry_t {
