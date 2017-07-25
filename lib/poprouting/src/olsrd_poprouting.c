@@ -60,30 +60,36 @@
 #include "info/info_types.h"
 #include "info/http_headers.h"
 #include "gateway_default_handler.h"
+#include "scheduler.h"
+
+float timer=0;
 
 unsigned long long get_supported_commands_mask(void) {
-  return SIW_NETJSON;
+  return SIW_POPROUTING;
 }
 
 bool isCommand(const char *str, unsigned long long siw) {
-  const char * prefix;
-  char cmd[10];
-  float timer = 0;
-  int ret, ret_val;
+  const char *prefix, s[2] = "=";
+  char *string, *cmd, *s_timer;
+  string = strdup(str);
   switch (siw) {
-    case SIW_POPROUTING_TC:
-      prefix = "HelloTimer";
+    case SIW_POPROUTING_HELLO:
+      prefix = "/HelloTimer";
       break;
 
-    case SIW_POPROUTING_HELLO:
-      prefix = "TcTimer";
+    case SIW_POPROUTING_TC:
+      prefix = "/TcTimer";
       break;
 
     default:
       return false;
   }
-  ret = sscanf(str, "/%s=%f", cmd, &timer);
-  return !strcmp(cmd, prefix);
+  cmd = strtok(string, s);
+  s_timer = strtok(NULL, s);
+  timer = atof(s_timer);
+
+
+  return (!strcmp(cmd, prefix) && timer>0);
 }
 
 void output_error(struct autobuf *abuf, unsigned int status, const char * req __attribute__((unused)), bool http_headers) {
@@ -103,9 +109,15 @@ void output_error(struct autobuf *abuf, unsigned int status, const char * req __
 
 
 void set_hello_timer(struct autobuf *abuf) {
+  int rel_timer = 0;
+  olsr_printf(0, "Setting Hello Timer=%f\n", timer);
+  olsr_change_timer(ifnet->hello_gen_timer, 1000*timer, OLSR_LINK_HELLO_JITTER,1);
   return;
 }
 
 void set_tc_timer(struct autobuf *abuf) {
+  int rel_timer = 0;
+  olsr_printf(0, "Setting TC Timer=%f\n", timer);
+  olsr_change_timer(ifnet->hello_gen_timer, 1000*timer, OLSR_LINK_HELLO_JITTER,1);
   return;
 }

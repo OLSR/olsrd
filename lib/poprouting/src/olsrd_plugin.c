@@ -98,7 +98,7 @@ static void my_fini(void) {
 int olsrd_plugin_init(void) {
   memset(&functions, 0, sizeof(functions));
 
-  functions.supportsCompositeCommands = true;
+  functions.supportsCompositeCommands = false;
   functions.supported_commands_mask = get_supported_commands_mask;
   functions.is_command = isCommand;
   functions.cache_timeout = cache_timeout_generic;

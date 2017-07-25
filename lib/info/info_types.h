@@ -113,13 +113,15 @@ typedef struct {
 #define SIW_NETJSON_NETWORK_COLLECTION   (1ULL << 19)
 #define SIW_NETJSON                      (SIW_NETJSON_NETWORK_ROUTES | SIW_NETJSON_NETWORK_GRAPH | SIW_NETJSON_DEVICE_CONFIGURATION | SIW_NETJSON_DEVICE_MONITORING | SIW_NETJSON_NETWORK_COLLECTION)
 
-/* everything */
-#define SIW_EVERYTHING                   ((SIW_NETJSON_NETWORK_COLLECTION << 1) - 1)
-
 /*poprouting */
 #define SIW_POPROUTING_HELLO             (1ULL << 20)
 #define SIW_POPROUTING_TC                (1ULL << 21)
-#define SIW_POPROUTING                   (SIW_POPROUTING_TC | SIW_POPROUTING_HELLO)
+#define SIW_POPROUTING                   (SIW_POPROUTING_HELLO | SIW_POPROUTING_TC)
+
+
+/* everything */
+#define SIW_EVERYTHING                   ((SIW_POPROUTING_TC << 1) - 1)
+
 
 /* command prefixes */
 #define SIW_PREFIX_HTTP                  "/http"

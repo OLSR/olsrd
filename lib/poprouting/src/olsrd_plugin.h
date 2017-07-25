@@ -47,8 +47,8 @@
  * Dynamic linked library for the olsr.org olsr daemon
  */
 
-#ifndef LIB_TXTINFO_SRC_OLSRD_PLUGIN_H_
-#define LIB_TXTINFO_SRC_OLSRD_PLUGIN_H_
+#ifndef LIB_POPROUTING_SRC_OLSRD_PLUGIN_H_
+#define LIB_POPROUTING_SRC_OLSRD_PLUGIN_H_
 
 #include "plugin_util.h"
 #include "info/info_types.h"
@@ -61,7 +61,7 @@ int olsrd_plugin_init(void);
 void olsr_plugin_exit(void);
 void olsrd_get_plugin_parameters(const struct olsrd_plugin_parameters **params, int *size);
 
-#endif /* LIB_TXTINFO_SRC_OLSRD_PLUGIN_H_ */
+#endif /* LIB_POPROUTING_SRC_OLSRD_PLUGIN_H_ */
 
 /*
  * Local Variables:
