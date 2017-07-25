@@ -47,7 +47,7 @@
  * Dynamic linked library for the olsr.org olsr daemon
  */
 
-#include "olsrd_txtinfo.h"
+#include "olsrd_poprouting.h"
 #include "olsrd_plugin.h"
 #include "info/olsrd_info.h"
 #include "olsr.h"

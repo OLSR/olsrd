@@ -467,7 +467,7 @@ static void send_info(const char * req, bool add_headers, unsigned int send_what
   unsigned int send_index = 0;
   bool first_reply = false;
 
-  const char *content_type = functions->determine_mime_type ? functions->determine_mime_type(send_what) : "text/plain; charset=utf-8";
+  const char *content_type = functions->determine_mime_type ? functions->determine_mime_type(send_what) : "text/plain; charset=utf-8"; //"
   int contentLengthIndex = 0;
   int headerLength = 0;
 
@@ -519,7 +519,8 @@ static void send_info(const char * req, bool add_headers, unsigned int send_what
         { SIW_POPROUTING_TC               , functions->TcTimer           }, //
         { SIW_POPROUTING_HELLO            , functions->HelloTimer        } //
       };
-
+      send_info_from_table(&abuf, send_what, funcs, ARRAY_SIZE(funcs), &outputLength);
+      
     } else if ((send_what & SIW_OLSRD_CONF) && functions->olsrd_conf) {
       /* this outputs the olsrd.conf text directly, not normal format */
       unsigned int preLength = abuf.len;
