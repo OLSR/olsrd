@@ -109,14 +109,12 @@ void output_error(struct autobuf *abuf, unsigned int status, const char * req __
 
 
 void set_hello_timer(struct autobuf *abuf) {
-  int rel_timer = 0;
   olsr_printf(0, "Setting Hello Timer=%f\n", timer);
   olsr_change_timer(ifnet->hello_gen_timer, 1000*timer, OLSR_LINK_HELLO_JITTER,1);
   return;
 }
 
 void set_tc_timer(struct autobuf *abuf) {
-  int rel_timer = 0;
   olsr_printf(0, "Setting TC Timer=%f\n", timer);
   olsr_change_timer(ifnet->hello_gen_timer, 1000*timer, OLSR_LINK_HELLO_JITTER,1);
   return;
