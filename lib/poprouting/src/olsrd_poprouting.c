@@ -109,13 +109,30 @@ void output_error(struct autobuf *abuf, unsigned int status, const char * req __
 
 
 void set_hello_timer(struct autobuf *abuf) {
-  olsr_printf(0, "Setting Hello Timer=%f\n", timer);
-  olsr_change_timer(ifnet->hello_gen_timer, 1000*timer, OLSR_LINK_HELLO_JITTER,1);
+  struct olsr_if *in;
+  in = olsr_cnf->interfaces;
+  while (in != NULL) {
+    olsr_printf(0, "Setting Hello Timer=%f for interface %s\n", (double)timer, in->name);
+    olsr_change_timer(in->interf->hello_gen_timer, timer * MSEC_PER_SEC, OLSR_LINK_HELLO_JITTER,1);
+    in->cnf->hello_params.emission_interval = timer;
+    in->cnf->hello_params.validity_time = timer *10;
+    in->interf->valtimes.hello = reltime_to_me(in->cnf->hello_params.validity_time * MSEC_PER_SEC);
+    in->interf->hello_etime = in->cnf->hello_params.emission_interval * MSEC_PER_SEC;
+    in = in->next;
+  }
   return;
 }
 
 void set_tc_timer(struct autobuf *abuf) {
-  olsr_printf(0, "Setting TC Timer=%f\n", timer);
-  olsr_change_timer(ifnet->hello_gen_timer, 1000*timer, OLSR_LINK_HELLO_JITTER,1);
+  struct olsr_if *in;
+  in = olsr_cnf->interfaces;
+  while (in != NULL) {
+    olsr_printf(0, "Setting Tc Timer=%f for interface %s\n", (double)timer, in->name);
+    olsr_change_timer(in->interf->tc_gen_timer, timer * MSEC_PER_SEC, OLSR_LINK_HELLO_JITTER,1);
+    in->cnf->tc_params.emission_interval = timer;
+    in->cnf->tc_params.validity_time = timer*10;
+    in->interf->valtimes.tc=reltime_to_me(in->cnf->tc_params.validity_time * MSEC_PER_SEC);
+    in = in->next;
+  }
   return;
 }
