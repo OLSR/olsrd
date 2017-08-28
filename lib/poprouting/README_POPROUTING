@@ -12,8 +12,8 @@ Please first read what's written in the file lib/info/README_INFO.
 SUPPORTED COMMANDS
 ==================
 
-* /HelloTimer=%d
-* /TCTimer=
+* /HelloTimer=%f
+* /TCTimer=%f
 ====================
 PLUGIN CONFIGURATION
 ====================
