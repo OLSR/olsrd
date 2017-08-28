@@ -47,8 +47,9 @@
 #define LIB_POPROUTING_SRC_OLSRD_POPROUTING_H_
 
 #include <stdbool.h>
-
 #include "common/autobuf.h"
+
+#define POPROUTING_JITTER 5
 
 unsigned long long get_supported_commands_mask(void);
 bool isCommand(const char *str, unsigned long long siw);
