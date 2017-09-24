@@ -1,0 +1,62 @@
+diff --git a/src/cfgparser/olsrd_conf.c b/src/cfgparser/olsrd_conf.c
+index c305856..064709e 100644
+--- a/src/cfgparser/olsrd_conf.c
++++ b/src/cfgparser/olsrd_conf.c
+@@ -81,7 +81,8 @@ const char *GW_UPLINK_TXT[] = {
+ 
+ const char *OLSR_IF_MODE[] = {
+   "mesh",
+-  "ether"
++  "ether",
++  "silent"
+ };
+ 
+ static char copyright_string[] __attribute__ ((unused)) =
+diff --git a/src/cfgparser/oparse.y b/src/cfgparser/oparse.y
+index 844c7a3..060853c 100644
+--- a/src/cfgparser/oparse.y
++++ b/src/cfgparser/oparse.y
+@@ -531,7 +531,7 @@ isetifmode: TOK_IFMODE TOK_STRING
+ {
+   int ifcnt = ifs_in_curr_cfg;
+   struct olsr_if *ifs = olsr_cnf->interfaces;
+-	int mode = (strcmp($2->string, "ether") == 0)?IF_MODE_ETHER:IF_MODE_MESH;
++	int mode = (strcmp($2->string, "ether") == 0)?IF_MODE_ETHER:((strcmp($2->string, "silent") == 0)?IF_MODE_SILENT:IF_MODE_MESH);
+ 
+   PARSER_DEBUG_PRINTF("\tMode: %s\n", $2->string);
+ 
+diff --git a/src/olsr.c b/src/olsr.c
+index 89b0b38..7299d7d 100644
+--- a/src/olsr.c
++++ b/src/olsr.c
+@@ -371,8 +371,17 @@ olsr_forward_message(union olsr_message *m, struct interface *in_if, union olsr_
+   /* Update packet data */
+   msgsize = ntohs(m->v4.olsr_msgsize);
+ 
++/*!!?? transform tc into delta-tc
++maybe keep track of last change in update_tc_edge, and of last full forward in tc itself (does such object exists?, e.g. check with validity timeout handling)
++first step print out how much data of the tc is irelevant, and maybe skip full messages which are irrelevant (ansn should show that too)
++maybe also count tc's to give info about which nodes have how much flooding packeloss or duplicated, and maybe ansn changes/hour (maybe total and running average of time between 2 ansn)
++*/
++
+   /* looping trough interfaces */
+   for (ifn = ifnet; ifn; ifn = ifn->int_next) {
++    /* do not retransmit out through a interface if it has mode == silent */
++    if (ifn->mode == IF_MODE_SILENT) continue;
++
+     /* do not retransmit out through the same interface if it has mode == ether */
+     if (ifn == in_if && ifn->mode == IF_MODE_ETHER) continue;
+ 
+diff --git a/src/olsr_cfg.h b/src/olsr_cfg.h
+index 47752e3..14c5c80 100644
+--- a/src/olsr_cfg.h
++++ b/src/olsr_cfg.h
+@@ -141,6 +141,7 @@ typedef enum {
+ enum olsr_if_mode {
+   IF_MODE_MESH,
+   IF_MODE_ETHER,
++  IF_MODE_SILENT,
+   IF_MODE_CNT
+ };
+ 
+

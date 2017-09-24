@@ -378,8 +378,17 @@ olsr_forward_message(union olsr_message *m, struct interface_olsr *in_if, union 
   /* Update packet data */
   msgsize = ntohs(m->v4.olsr_msgsize);
 
+/*!!?? transform tc into delta-tc
+maybe keep track of last change in update_tc_edge, and of last full forward in tc itself (does such object exists?, e.g. check with validity timeout handling)
+first step print out how much data of the tc is irelevant, and maybe skip full messages which are irrelevant (ansn should show that too)
+maybe also count tc's to give info about which nodes have how much flooding packeloss or duplicated, and maybe ansn changes/hour (maybe total and running average of time between 2 ansn)
+*/
+
   /* looping trough interfaces */
   for (ifn = ifnet; ifn; ifn = ifn->int_next) {
+    /* do not retransmit out through a interface if it has mode == silent */
+    if (ifn->mode == IF_MODE_SILENT) continue;
+
     /* do not retransmit out through the same interface if it has mode == ether */
     if (ifn == in_if && ifn->mode == IF_MODE_ETHER) continue;
 
