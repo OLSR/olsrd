@@ -75,15 +75,12 @@ fi
 gitDescriptor="$(git describe --dirty --always 2> /dev/null)"
 
 sourceHash="$(cat $(find . -name *.[ch] | grep -v -E '[/\\]?builddata.c$') | "$md5Command" | awk '{ print $1; }')"
-hostName="$(hostname)"
-buildDate="$(date +"%Y-%m-%d %H:%M:%S")"
 
 tmpBuildDataTxt="$(mktemp -t olsrd.hash_source.XXXXXXXXXX)"
 cat > "$tmpBuildDataTxt" << EOF
 const char olsrd_version[]   = "olsr.org - $version-git_$gitSha-hash_$sourceHash";
 
 const char build_date[]      = "$buildDate";
-const char build_host[]      = "$hostName";
 const char git_descriptor[]  = "$gitDescriptor";
 const char git_sha[]         = "$gitShaFull";
 const char release_version[] = "$version";
@@ -91,20 +88,11 @@ const char source_hash[]     = "$sourceHash";
 EOF
 
 
-if [ ! -e "$buildDataTxt" ]; then
-  echo "[CREATE] $buildDataTxt"
-  if [ "$verbose" = "0" ]; then
-    cp -p "$tmpBuildDataTxt" "$buildDataTxt"
-  else
-    cp -p -v "$tmpBuildDataTxt" "$buildDataTxt"
-  fi
-elif [ -n "$(diff -I "^const char build_date\[\].*\$" "$tmpBuildDataTxt" "$buildDataTxt" | sed 's/"/\\"/g')" ]; then
-  echo "[UPDATE] $buildDataTxt"
-  if [ "$verbose" = "0" ]; then
-    cp -p "$tmpBuildDataTxt" "$buildDataTxt"
-  else
-    cp -p -v "$tmpBuildDataTxt" "$buildDataTxt"
-  fi
+echo "[CREATE] $buildDataTxt"
+if [ "$verbose" = "0" ]; then
+  cp -p "$tmpBuildDataTxt" "$buildDataTxt"
+else
+  cp -p -v "$tmpBuildDataTxt" "$buildDataTxt"
 fi
 rm -f "$tmpBuildDataTxt"
 
