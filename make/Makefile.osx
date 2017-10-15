@@ -52,7 +52,7 @@ STRIP = \#
 DESTDIR ?=
 LIBDIR =	$(DESTDIR)/usr/lib
 
-SRCS +=		$(wildcard src/bsd/*.c src/unix/*.c src/mach/*.c)
+SRCS +=		$(sort $(wildcard src/bsd/*.c src/unix/*.c src/mach/*.c))
 HDRS +=		$(wildcard src/bsd/*.h src/unix/*.h src/mach/*.h)
 
 LIBS +=		

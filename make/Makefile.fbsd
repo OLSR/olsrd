@@ -52,7 +52,7 @@ LIBDIR = $(PREFIX)/lib
 DOCDIR = $(PREFIX)/share/doc
 MANDIR = $(PREFIX)/man
 
-SRCS +=		$(wildcard src/bsd/*.c) $(wildcard src/unix/*.c)
+SRCS +=		$(sort $(wildcard src/bsd/*.c) $(wildcard src/unix/*.c))
 HDRS +=		$(wildcard src/bsd/*.h) $(wildcard src/unix/*.h)
 
 LIBS =
