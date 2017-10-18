@@ -187,6 +187,8 @@ void abuf_json_int(struct json_session *session, struct autobuf *abuf, const cha
 }
 
 void abuf_json_float(struct json_session *session, struct autobuf *abuf, const char* key, double value) {
+#define isinf(x) __builtin_isinf(x)
+#define isnan(x) __builtin_isnan(x)
   double v = value;
   int isInf = isinf(v);
 
