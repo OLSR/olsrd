@@ -17,7 +17,7 @@ INCLUDEDIR ?= $(DESTDIR)/usr/include
 LIBDIR ?= $(USRDIR)/lib
 
 H_FILES = $(wildcard include/nmealib/*.h)
-C_FILES = $(wildcard src/*.c)
+C_FILES = $(sort $(wildcard src/*.c))
 
 MODULES = $(C_FILES:src/%.c=%)
 

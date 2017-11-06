@@ -48,7 +48,7 @@
 DESTDIR ?=
 LIBDIR =	$(DESTDIR)/usr/lib
 
-SRCS +=		$(wildcard src/win32/*.c)
+SRCS +=		$(sort $(wildcard src/win32/*.c))
 HDRS +=		$(wildcard src/win32/*.h)
 
 CPPFLAGS +=	-DWIN32 -DWINCE

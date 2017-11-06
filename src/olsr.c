@@ -200,7 +200,7 @@ olsr_process_changes(void)
 
   if (olsr_cnf->debug_level > 0 && olsr_cnf->clear_screen && isatty(1)) {
     clear_console();
-    printf("       *** %s (%s on %s) ***\n", olsrd_version, build_date, build_host);
+    printf("       *** %s ***\n", olsrd_version);
   }
 
   if (changes_neighborhood) {
