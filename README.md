@@ -20,7 +20,7 @@ For Debian you will mostly need the following ones:
 
   * ``cd olsrd``
   * ``make``
-  * (plugins) ``cd lib; for i in $(ls); do cd "$i"; make; cd ..; done``
+  * (plugins) ``make libs``
 
 ## Configuring OLSRd
 
@@ -28,11 +28,11 @@ For Debian you will mostly need the following ones:
 
 Assuming your interfaces you want olsrd to listen on are ``eth0, wlan0 and lo`` you could start it like this:
 
-  * ``sudo ./olsrd_static -i eth0 wlan0 lo -d 0 -f olsrd.conf``
+  * ``sudo ./olsrd_static -i eth0 wlan0 lo -d 0``
 
-You won't see much output though. You can enable more output with with:
+You won't see much output though. You can enable more output with:
 
-  * ``sudo ./olsrd_static -i eth0 -d 1 -f olsrd.conf``
+  * ``sudo ./olsrd_static -i eth0 -d 1``
 
 ## How to proceed from here
 
