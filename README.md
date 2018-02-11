@@ -26,6 +26,8 @@ For Debian you will mostly need the following ones:
 
 ## Starting OLSRd
 
+By default the configuration will be loaded from /etc/olsrd/olsrd.conf
+
 Assuming your interfaces you want olsrd to listen on are ``eth0, wlan0 and lo`` you could start it like this:
 
   * ``sudo ./olsrd_static -i eth0 wlan0 lo -d 0``
