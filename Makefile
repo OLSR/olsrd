@@ -224,7 +224,7 @@ rpm:
 
 # This is quite ugly but at least it works
 ifeq ($(OS),linux)
-SUBDIRS := arprefresh bmf dot_draw dyn_gw dyn_gw_plain httpinfo info jsoninfo mdns mini nameservice netjson p2pd pgraph pud quagga secure sgwdynspeed txtinfo watchdog
+SUBDIRS := arprefresh bmf dot_draw dyn_gw dyn_gw_plain httpinfo info jsoninfo mdns mini nameservice netjson poprouting p2pd pgraph pud quagga secure sgwdynspeed txtinfo watchdog
 else
 ifeq ($(OS),win32)
 SUBDIRS := dot_draw httpinfo info jsoninfo mini netjson pgraph secure txtinfo
@@ -409,6 +409,18 @@ netjson_install: info_install
 
 netjson_uninstall: info_uninstall
 		$(MAKECMDPREFIX)$(MAKECMD) -C lib/netjson DESTDIR=$(DESTDIR) uninstall
+
+poprouting: info
+		$(MAKECMDPREFIX)$(MAKECMD) -C lib/poprouting
+
+poprouting_clean: info_clean
+		$(MAKECMDPREFIX)$(MAKECMD) -C lib/poprouting DESTDIR=$(DESTDIR) clean
+
+poprouting_install: info_install
+		$(MAKECMDPREFIX)$(MAKECMD) -C lib/poprouting DESTDIR=$(DESTDIR) install
+
+poprouting_uninstall: info_uninstall
+		$(MAKECMDPREFIX)$(MAKECMD) -C lib/poprouting DESTDIR=$(DESTDIR) uninstall
 
 p2pd:
 		$(MAKECMDPREFIX)$(MAKECMD) -C lib/p2pd

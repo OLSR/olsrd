@@ -148,7 +148,12 @@ static unsigned long long SIW_ENTRIES_ALL[] = {
     SIW_NETJSON_NETWORK_GRAPH, //
     SIW_NETJSON_DEVICE_CONFIGURATION, //
     SIW_NETJSON_DEVICE_MONITORING, //
-    SIW_NETJSON_NETWORK_COLLECTION //
+    SIW_NETJSON_NETWORK_COLLECTION, //
+    //
+    SIW_POPROUTING_HELLO,
+    SIW_POPROUTING_TC, //
+    SIW_POPROUTING_HELLO_MULT,
+    SIW_POPROUTING_TC_MULT //
     };
 
 long cache_timeout_generic(info_plugin_config_t *plugin_config, unsigned long long siw) {
@@ -525,6 +530,15 @@ static void send_info(const char * req, bool add_headers, unsigned int send_what
         { SIW_NETJSON_NETWORK_COLLECTION  , functions->networkCollection  } //
       };
 
+      send_info_from_table(&abuf, send_what, funcs, ARRAY_SIZE(funcs), &outputLength);
+    } else if(send_what & SIW_POPROUTING){
+      SiwLookupTableEntry funcs[] = {
+        { SIW_POPROUTING_TC               , functions->tcTimer           }, //
+        { SIW_POPROUTING_HELLO            , functions->helloTimer        }, //
+        { SIW_POPROUTING_TC_MULT          , functions->tcTimerMult       }, //
+        { SIW_POPROUTING_HELLO_MULT       , functions->helloTimerMult    } //
+      };
+      
       send_info_from_table(&abuf, send_what, funcs, ARRAY_SIZE(funcs), &outputLength);
     } else if ((send_what & SIW_OLSRD_CONF) && functions->olsrd_conf) {
       /* this outputs the olsrd.conf text directly, not normal format */
