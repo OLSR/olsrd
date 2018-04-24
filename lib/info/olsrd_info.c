@@ -408,6 +408,7 @@ static void write_data(void *unused __attribute__((unused))) {
 
   if (!outbuffer.count) {
     olsr_stop_timer(writetimer_entry);
+    writetimer_entry = NULL;
   }
 }
 

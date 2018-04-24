@@ -695,7 +695,7 @@ walk_timers(uint32_t * last_run)
       list_add_after(&tmp_head_node, timer_node);
       timers_walked++;
 
-      if (timer->timer_flags & OLSR_TIMER_REMOVED) {
+      if (!(timer->timer_flags & OLSR_TIMER_TODO)) {
         continue;
       }
 
@@ -710,20 +710,17 @@ walk_timers(uint32_t * last_run)
         /* This timer is expired, call into the provided callback function */
         timer->timer_cb(timer->timer_cb_context);
 
-        /* Only act on actually running timers */
-        if (timer->timer_flags & OLSR_TIMER_RUNNING) {
-          /*
-           * Don't restart the periodic timer if the callback function has
-           * stopped the timer.
-           */
-          if (timer->timer_period) {
-            /* For periodical timers, rehash the random number and restart */
-            timer->timer_random = olsr_random();
-            olsr_change_timer(timer, timer->timer_period, timer->timer_jitter_pct, OLSR_TIMER_PERIODIC);
-          } else {
-            /* Singleshot timers are stopped */
-            olsr_stop_timer(timer);
-          }
+        /*
+         * Don't restart the periodic timer if the callback function has
+         * stopped the timer.
+         */
+        if (timer->timer_period) {
+          /* For periodical timers, rehash the random number and restart */
+          timer->timer_random = olsr_random();
+          olsr_change_timer(timer, timer->timer_period, timer->timer_jitter_pct, OLSR_TIMER_PERIODIC);
+        } else {
+          /* Singleshot timers are stopped */
+          olsr_stop_timer(timer);
         }
 
         timers_fired++;
@@ -924,7 +921,7 @@ olsr_start_timer(unsigned int rel_time,
   timer->timer_cb = cb_func;
   timer->timer_cb_context = context;
   timer->timer_jitter_pct = jitter_pct;
-  timer->timer_flags = OLSR_TIMER_RUNNING;
+  timer->timer_flags = OLSR_TIMER_TODO;
 
   /* The cookie is used for debugging to traceback the originator */
   timer->timer_cookie = ci;
@@ -953,8 +950,7 @@ void
 olsr_stop_timer(struct timer_entry *timer)
 {
   /* It's okay to get a NULL here */
-  if (!timer //
-      || !(timer->timer_flags & OLSR_TIMER_RUNNING)) {
+  if (!timer) {
     return;
   }
 
@@ -964,8 +960,7 @@ olsr_stop_timer(struct timer_entry *timer)
              timer->timer_cookie->ci_name, timer, timer->timer_cb_context);
 
 
-  timer->timer_flags &= ~OLSR_TIMER_RUNNING;
-  timer->timer_flags |= OLSR_TIMER_REMOVED;
+  timer->timer_flags &= ~OLSR_TIMER_TODO;
 
   {
     struct timer_cleanup_entry * node = olsr_malloc(sizeof(struct timer_cleanup_entry), "timer cleanup entry");
@@ -988,7 +983,7 @@ olsr_cleanup_timer(struct timer_entry *timer)
 {
   /* It's okay to get a NULL here */
   if (!timer //
-      || !(timer->timer_flags & OLSR_TIMER_REMOVED)) {
+      || (timer->timer_flags & OLSR_TIMER_TODO)) {
     return;
   }
 
@@ -1002,7 +997,6 @@ olsr_cleanup_timer(struct timer_entry *timer)
    * Carve out of the existing wheel_slot and free.
    */
   list_remove(&timer->timer_list);
-  timer->timer_flags &= ~OLSR_TIMER_REMOVED;
   olsr_cookie_usage_decr(timer->timer_cookie->ci_id);
 
   olsr_cookie_free(timer_mem_cookie, timer);
