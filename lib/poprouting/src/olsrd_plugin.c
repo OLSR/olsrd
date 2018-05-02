@@ -120,6 +120,16 @@ int olsrd_plugin_interface_version(void) {
   return PLUGIN_INTERFACE_VERSION;
 }
 
+static const struct olsrd_plugin_parameters plugin_parameters[] = { //
+    //
+        INFO_PLUGIN_CONFIG_PLUGIN_PARAMETERS(config)//
+    };
+
+void olsrd_get_plugin_parameters(const struct olsrd_plugin_parameters **params, int *size) {
+  *params = plugin_parameters;
+  *size = sizeof(plugin_parameters) / sizeof(*plugin_parameters);
+}
+
 /*
  * Local Variables:
  * mode: c
