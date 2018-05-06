@@ -39,18 +39,11 @@
  */
 
 
-#ifndef _DROPHNA_H
-#define _DROPHNA_H
+#ifndef LIB_DROPHNA_SRC_OLSRD_DROPHNA_H_
+#define LIB_DROPHNA_SRC_OLSRD_DROPHNA_H_
 
-#include "olsr_types.h" //for the fucking bool
+#include "olsr_types.h"
 #include "lq_packet.h"
-
-/* BLACKLIST plugin data */
-#define PLUGIN_NAME               "OLSRD drophna plugin"
-#define PLUGIN_NAME_SHORT         "OLSRD drophna"
-#define PLUGIN_VERSION            "0.0.0 (" __DATE__ " " __TIME__ ")"
-#define MOD_DESC PLUGIN_NAME      " " PLUGIN_VERSION
-#define PLUGIN_INTERFACE_VERSION  5
 
 void olsrd_drophna_init(void);
 bool olsrd_drophna_parser(union olsr_message *m,
@@ -58,7 +51,7 @@ bool olsrd_drophna_parser(union olsr_message *m,
 		union olsr_ip_addr *ipaddr);
 
 
-#endif /* _DROPHNA_H*/
+#endif /* LIB_DROPHNA_SRC_OLSRD_DROPHNA_H_ */
 
 /*
  * Local Variables:

@@ -1,7 +1,11 @@
-
 /*
- * The olsr.org Optimized Link-State Routing daemon(olsrd)
- * Copyright (c) 2004, Andreas Tonnesen(andreto@olsr.org)
+ * The olsr.org Optimized Link-State Routing daemon (olsrd)
+ *
+ * (c) by the OLSR project
+ *
+ * See our Git repository to find out who worked on this file
+ * and thus is a copyright holder on it.
+ *
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,87 +47,20 @@
  * Dynamic linked library for the olsr.org olsr daemon
  */
 
-#include "olsrd_plugin.h"
+#ifndef LIB_DROPHNA_SRC_OLSRD_PLUGIN_H_
+#define LIB_DROPHNA_SRC_OLSRD_PLUGIN_H_
+
 #include "plugin_util.h"
-#include "olsr.h"
-#include "defs.h"
-#include "olsrd_drophna.h"
-#include "parser.h"
-#include "builddata.h"
 
-#define PLUGIN_NAME              "DROPHNA"
-#define PLUGIN_TITLE             "OLSRD drophna plugin"
-#define PLUGIN_INTERFACE_VERSION 5
+int olsrd_plugin_interface_version(void);
+int olsrd_plugin_init(void);
+void olsr_plugin_exit(void);
+void olsrd_get_plugin_parameters(const struct olsrd_plugin_parameters **params, int *size);
 
-static void my_init(void) __attribute__ ((constructor));
-static void my_fini(void) __attribute__ ((destructor));
-
-/**
- *Constructor
- */
-static void
-my_init(void)
-{
-  /* Print plugin info to stdout */
-  OLSR_PRINTF(0, "%s (%s)\n", PLUGIN_NAME, git_descriptor);
-}
-
-/**
- *Destructor
- */
-static void
-my_fini(void)
-{
-  /* Calls the destruction function
-   * olsr_plugin_exit()
-   * This function should be present in your
-   * sourcefile and all data destruction
-   * should happen there - NOT HERE!
-   */
-  olsr_plugin_exit();
-}
-
-/**
- *Do initialization here
- *
- *This function is called by the my_init
- *function in uolsrd_plugin.c
- */
-int olsrd_plugin_init(void) {
-  olsr_parser_add_function(&olsrd_drophna_parser, HNA_MESSAGE);
-  return 0;
-}
-
-/**
- * destructor - called at unload
- */
-void olsr_plugin_exit(void) {
-}
-
-static const struct olsrd_plugin_parameters plugin_parameters[] = {
-};
-
-/**
- * Plugin interface version
- * Used by main olsrd to check plugin interface version
- */
-int
-olsrd_plugin_interface_version(void)
-{
-  return PLUGIN_INTERFACE_VERSION;
-}
-
-void
-olsrd_get_plugin_parameters(const struct olsrd_plugin_parameters **params, int *size)
-{
-  *params = plugin_parameters;
-  *size = sizeof(plugin_parameters) / sizeof(*plugin_parameters);
-}
+#endif /* LIB_DROPHNA_SRC_OLSRD_PLUGIN_H_ */
 
 /*
  * Local Variables:
- * mode: c
- * style: linux
  * c-basic-offset: 2
  * indent-tabs-mode: nil
  * End:
