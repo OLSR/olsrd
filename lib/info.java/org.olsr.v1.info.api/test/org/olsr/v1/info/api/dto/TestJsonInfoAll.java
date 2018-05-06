@@ -101,7 +101,7 @@ public class TestJsonInfoAll {
     pudPosition.setLatitude(1.1);
 
     final JsonInfoVersionEntry version = new JsonInfoVersionEntry();
-    version.setBuildDate("now");
+    version.setVersion("now");
 
     final List<JsonInfoPluginsEntry> plugins = new LinkedList<>();
     final JsonInfoPluginsEntry pluginsEntry = new JsonInfoPluginsEntry();
@@ -238,7 +238,7 @@ public class TestJsonInfoAll {
     pudPosition.setLatitude(1.1);
 
     final JsonInfoVersionEntry version = new JsonInfoVersionEntry();
-    version.setBuildDate("now");
+    version.setVersion("now");
 
     final List<JsonInfoPluginsEntry> plugins = new LinkedList<>();
     final JsonInfoPluginsEntry pluginsEntry = new JsonInfoPluginsEntry();
@@ -455,7 +455,7 @@ public class TestJsonInfoAll {
   public void testHashCode() {
     this.impl.setNeighbors(null);
     int r = this.impl.hashCode();
-    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(-557529111)));
+    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(1381794729)));
 
     /* set */
     final Set<JsonInfoNeighborsEntry> neighbors = new TreeSet<>();
@@ -502,7 +502,7 @@ public class TestJsonInfoAll {
     pudPosition.setLatitude(1.1);
 
     final JsonInfoVersionEntry version = new JsonInfoVersionEntry();
-    version.setBuildDate("now");
+    version.setVersion("now");
 
     final List<JsonInfoPluginsEntry> plugins = new LinkedList<>();
     final JsonInfoPluginsEntry pluginsEntry = new JsonInfoPluginsEntry();
@@ -527,7 +527,7 @@ public class TestJsonInfoAll {
     this.impl.setConfig(config);
 
     r = this.impl.hashCode();
-    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(-260548917)));
+    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(809053303)));
   }
 
   @Test(timeout = 8000)

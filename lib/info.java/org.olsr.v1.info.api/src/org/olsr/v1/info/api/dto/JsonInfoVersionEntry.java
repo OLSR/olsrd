@@ -12,8 +12,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @ProviderType
 public class JsonInfoVersionEntry implements Comparable<JsonInfoVersionEntry> {
   private String version        = "";
-  private String buildDate      = "";
-  private String buildHost      = "";
   private String gitDescriptor  = "";
   private String gitSha         = "";
   private String releaseVersion = "";
@@ -35,44 +33,6 @@ public class JsonInfoVersionEntry implements Comparable<JsonInfoVersionEntry> {
       this.version = "";
     } else {
       this.version = version;
-    }
-  }
-
-  /**
-   * @return the build date
-   */
-  public String getBuildDate() {
-    return this.buildDate;
-  }
-
-  /**
-   * @param buildDate the build date to set
-   */
-  @JsonProperty("date")
-  public void setBuildDate(final String buildDate) {
-    if (buildDate == null) {
-      this.buildDate = "";
-    } else {
-      this.buildDate = buildDate;
-    }
-  }
-
-  /**
-   * @return the build host
-   */
-  public String getBuildHost() {
-    return this.buildHost;
-  }
-
-  /**
-   * @param buildHost the build host to set
-   */
-  @JsonProperty("host")
-  public void setBuildHost(final String buildHost) {
-    if (buildHost == null) {
-      this.buildHost = "";
-    } else {
-      this.buildHost = buildHost;
     }
   }
 
@@ -157,8 +117,6 @@ public class JsonInfoVersionEntry implements Comparable<JsonInfoVersionEntry> {
     final int prime = 31;
     int result = 1;
     result = (prime * result) + this.version.hashCode();
-    result = (prime * result) + this.buildDate.hashCode();
-    result = (prime * result) + this.buildHost.hashCode();
     result = (prime * result) + this.gitDescriptor.hashCode();
     result = (prime * result) + this.gitSha.hashCode();
     result = (prime * result) + this.releaseVersion.hashCode();
@@ -195,16 +153,6 @@ public class JsonInfoVersionEntry implements Comparable<JsonInfoVersionEntry> {
       return CompareUtils.clip(result);
     }
 
-    result = this.buildDate.compareTo(other.buildDate);
-    if (result != 0) {
-      return CompareUtils.clip(result);
-    }
-
-    result = this.buildHost.compareTo(other.buildHost);
-    if (result != 0) {
-      return CompareUtils.clip(result);
-    }
-
     result = this.gitDescriptor.compareTo(other.gitDescriptor);
     if (result != 0) {
       return CompareUtils.clip(result);
@@ -233,10 +181,6 @@ public class JsonInfoVersionEntry implements Comparable<JsonInfoVersionEntry> {
     final StringBuilder builder = new StringBuilder();
     builder.append("JsonInfoVersionEntry [version=");
     builder.append(this.version);
-    builder.append(", buildDate=");
-    builder.append(this.buildDate);
-    builder.append(", buildHost=");
-    builder.append(this.buildHost);
     builder.append(", gitDescriptor=");
     builder.append(this.gitDescriptor);
     builder.append(", gitSha=");

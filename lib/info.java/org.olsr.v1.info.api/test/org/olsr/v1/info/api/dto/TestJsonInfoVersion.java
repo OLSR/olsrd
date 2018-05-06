@@ -101,7 +101,7 @@ public class TestJsonInfoVersion {
   @Test(timeout = 8000)
   public void testHashCode() {
     int r = this.impl.hashCode();
-    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(-809346626)));
+    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(1771439486)));
 
     /* set */
     final JsonInfoVersionEntry version = new JsonInfoVersionEntry();
@@ -109,7 +109,7 @@ public class TestJsonInfoVersion {
     this.impl.setVersion(version);
 
     r = this.impl.hashCode();
-    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(-922014568)));
+    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(1623836376)));
   }
 
   @Test(timeout = 8000)

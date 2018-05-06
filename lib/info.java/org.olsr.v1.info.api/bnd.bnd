@@ -6,7 +6,7 @@
 	com.fasterxml.jackson.core.jackson-databind,\
 	${junit}
 Bundle-Name:OLSRd v1 Info - API
-Bundle-Version:1.1.1.${tstamp}
+Bundle-Version: 2.0.0.${tstamp}
 Export-Package: \
 	org.olsr.v1.info.api.commands,\
 	org.olsr.v1.info.api.contants,\

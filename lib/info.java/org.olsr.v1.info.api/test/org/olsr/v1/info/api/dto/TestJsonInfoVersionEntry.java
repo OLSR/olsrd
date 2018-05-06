@@ -25,8 +25,6 @@ public class TestJsonInfoVersionEntry {
   public void testGettersAndSetters() {
     /* initial */
     assertThat(this.impl.getVersion(), equalTo(""));
-    assertThat(this.impl.getBuildDate(), equalTo(""));
-    assertThat(this.impl.getBuildHost(), equalTo(""));
     assertThat(this.impl.getGitDescriptor(), equalTo(""));
     assertThat(this.impl.getGitSha(), equalTo(""));
     assertThat(this.impl.getReleaseVersion(), equalTo(""));
@@ -34,8 +32,6 @@ public class TestJsonInfoVersionEntry {
 
     /* set */
     this.impl.setVersion("version");
-    this.impl.setBuildDate("date");
-    this.impl.setBuildHost("host");
     this.impl.setGitDescriptor("gitDescriptor");
     this.impl.setGitSha("gitSha");
     this.impl.setReleaseVersion("releaseVersion");
@@ -43,8 +39,6 @@ public class TestJsonInfoVersionEntry {
 
     /* get */
     assertThat(this.impl.getVersion(), equalTo("version"));
-    assertThat(this.impl.getBuildDate(), equalTo("date"));
-    assertThat(this.impl.getBuildHost(), equalTo("host"));
     assertThat(this.impl.getGitDescriptor(), equalTo("gitDescriptor"));
     assertThat(this.impl.getGitSha(), equalTo("gitSha"));
     assertThat(this.impl.getReleaseVersion(), equalTo("releaseVersion"));
@@ -58,8 +52,6 @@ public class TestJsonInfoVersionEntry {
 
     final String version1 = "version1";
     final String version2 = "version2";
-    final String date1 = "date1";
-    final String date2 = "date2";
     final String host1 = "host1";
     final String host2 = "host2";
 
@@ -94,60 +86,6 @@ public class TestJsonInfoVersionEntry {
 
     this.impl.setVersion(versionOrg);
     other.setVersion(versionOrg);
-
-    /* date */
-
-    final String dateOrg = this.impl.getBuildDate();
-
-    this.impl.setBuildDate(null);
-    other.setBuildDate(date2);
-    r = this.impl.compareTo(other);
-    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(-1)));
-
-    this.impl.setBuildDate(date2);
-    other.setBuildDate(null);
-    r = this.impl.compareTo(other);
-    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(1)));
-
-    this.impl.setBuildDate(date1);
-    other.setBuildDate(date2);
-    r = this.impl.compareTo(other);
-    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(-1)));
-
-    this.impl.setBuildDate(date1);
-    other.setBuildDate(date1);
-    r = this.impl.compareTo(other);
-    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(0)));
-
-    this.impl.setBuildDate(dateOrg);
-    other.setBuildDate(dateOrg);
-
-    /* host */
-
-    final String hostOrg = this.impl.getBuildHost();
-
-    this.impl.setBuildHost(null);
-    other.setBuildHost(host2);
-    r = this.impl.compareTo(other);
-    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(-1)));
-
-    this.impl.setBuildHost(host2);
-    other.setBuildHost(null);
-    r = this.impl.compareTo(other);
-    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(1)));
-
-    this.impl.setBuildHost(host1);
-    other.setBuildHost(host2);
-    r = this.impl.compareTo(other);
-    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(-1)));
-
-    this.impl.setBuildHost(host1);
-    other.setBuildHost(host1);
-    r = this.impl.compareTo(other);
-    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(0)));
-
-    this.impl.setBuildHost(hostOrg);
-    other.setBuildHost(hostOrg);
 
     /* gitDescriptor */
 
@@ -286,18 +224,16 @@ public class TestJsonInfoVersionEntry {
   @Test(timeout = 8000)
   public void testHashCode() {
     int r = this.impl.hashCode();
-    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(1742810335)));
+    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(28629151)));
 
     this.impl.setVersion("version");
-    this.impl.setBuildDate("date");
-    this.impl.setBuildHost("host");
     this.impl.setGitDescriptor("gitDescriptor");
     this.impl.setGitSha("gitSha");
     this.impl.setReleaseVersion("releaseVersion");
     this.impl.setSourceHash("sourceHash");
 
     r = this.impl.hashCode();
-    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(632880642)));
+    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(1960702216)));
   }
 
   @Test(timeout = 8000)

@@ -37,7 +37,7 @@ public class TestJsonInfoStartup {
 
     /* set */
     final JsonInfoVersionEntry version = new JsonInfoVersionEntry();
-    version.setBuildDate("now");
+    version.setVersion("now");
 
     final List<JsonInfoPluginsEntry> plugins = new LinkedList<>();
     final JsonInfoPluginsEntry pluginsEntry = new JsonInfoPluginsEntry();
@@ -71,7 +71,7 @@ public class TestJsonInfoStartup {
   @Test(timeout = 8000)
   public void testEquals() {
     final JsonInfoVersionEntry version = new JsonInfoVersionEntry();
-    version.setBuildDate("now");
+    version.setVersion("now");
 
     final List<JsonInfoPluginsEntry> plugins = new LinkedList<>();
     final JsonInfoPluginsEntry pluginsEntry = new JsonInfoPluginsEntry();
@@ -156,11 +156,11 @@ public class TestJsonInfoStartup {
   @Test(timeout = 8000)
   public void testHashCode() {
     int r = this.impl.hashCode();
-    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(-207496464)));
+    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(1731827376)));
 
     /* set */
     final JsonInfoVersionEntry version = new JsonInfoVersionEntry();
-    version.setBuildDate("now");
+    version.setVersion("now");
 
     final List<JsonInfoPluginsEntry> plugins = new LinkedList<>();
     final JsonInfoPluginsEntry pluginsEntry = new JsonInfoPluginsEntry();
@@ -174,14 +174,14 @@ public class TestJsonInfoStartup {
     this.impl.setConfig(config);
 
     r = this.impl.hashCode();
-    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(-254958928)));
+    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(814643292)));
 
     /* set */
     this.impl.setVersion(null);
     this.impl.setPlugins(null);
     this.impl.setConfig(null);
 
-    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(-254958928)));
+    assertThat(Integer.valueOf(r), equalTo(Integer.valueOf(814643292)));
   }
 
   @Test(timeout = 8000)

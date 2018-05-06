@@ -1839,8 +1839,6 @@
   },
   "version": {
     "version": "olsr.org - pre-0.9.1-git_4e58755-hash_f013046cc98a88d68312f1e1566e865e",
-    "date": "2015-11-23 15:01:02",
-    "host": "buildhost",
     "gitDescriptor": "v0.9.0.3-157-g4e58755",
     "gitSha": "4e58755a1d3c75a656851873c7eab23c304049c6",
     "releaseVersion": "pre-0.9.1",
