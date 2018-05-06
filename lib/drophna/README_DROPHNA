@@ -1,0 +1,32 @@
+---------------------------------------------------------------------
+drophna PLUGIN FOR OLSRD
+---------------------------------------------------------------------
+
+This plugin is used to remove all gateway (0.0.0.0) HNA's thus 
+preventing internet traffic from traveling through the node.  HNA
+messages are manipulated directly by shortening the message by
+moving the remainder of the message over the gateway announcement.
+
+An example setup would be a vpn server used to intconnect mesh 
+islands. Routing to all nodes work, but none of the connected 
+islands receive gateway announcemens from another island. 
+
+---------------------------------------------------------------------
+PLUGIN PARAMETERS (PlParam)
+---------------------------------------------------------------------
+
+None.
+
+---------------------------------------------------------------------
+SAMPLE CONFIG
+---------------------------------------------------------------------
+
+add in /etc/olsrd/olsrd.conf:
+
+LoadPlugin "olsrd_drophna.so.0.0.0"
+{
+}
+
+
+---------------------------------------------------------------------
+EOF / 06.05.2018
