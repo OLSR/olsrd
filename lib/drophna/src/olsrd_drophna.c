@@ -79,9 +79,9 @@
 #include "olsrd_drophna.h"
 
 /* -------------------------------------------------------------------------
- * Function   : olsr_blacklist_parser
+ * Function   : olsr_drophna_parser
  * Description: Function to be passed to the parser engine. This function
- *              processes the incoming message and passes it on if necessary.
+ *              processes the incoming message and removes any gw hna's.
  * Input      : m      - message to parse
  *              in_if  - interface to use (unused in this application)
  *              ipaddr - IP-address to use (unused in this application)
@@ -92,7 +92,7 @@
 bool
 olsrd_drophna_parser(
     union olsr_message *m,
-    struct interface *in_if __attribute__ ((unused)),
+    struct interface_olsr *in_if __attribute__ ((unused)),
     union olsr_ip_addr *ipaddr __attribute__ ((unused))
 ){
 
@@ -104,7 +104,7 @@ olsrd_drophna_parser(
   uint16_t msg_seq_number;
 
   int hnasize;
-  const uint8_t *curr, *curr_end;
+  const uint8_t *curr, *curr_end, *olsr_msgsize_p;
 
   struct ipaddr_str buf;
 #ifdef DEBUG
@@ -127,6 +127,7 @@ olsrd_drophna_parser(
   pkt_get_reltime(&curr, &vtime);
 
   /* olsr_msgsize */
+  olsr_msgsize_p = curr;
   pkt_get_u16(&curr, &olsr_msgsize);
 
   hnasize = olsr_msgsize - 8 - olsr_cnf->ipsize;
@@ -162,23 +163,24 @@ olsrd_drophna_parser(
     if (is_prefix_inetgw(&prefix)) {
         hnasize -= 2 * olsr_cnf->ipsize;
         if (0 < hnasize) {
-            uint8_t *dest = curr - 2 * olsr_cnf->ipsize;
+            uint8_t *dest, *temp_msgsize;
+            /* move the rest of the message forward over the gw HNA */
+            dest = curr - 2 * olsr_cnf->ipsize;
             memmove(dest, curr, curr_end - curr);
             curr_end -= 2 * olsr_cnf->ipsize;
             curr = dest;
-            if (olsr_cnf->ip_version == AF_INET) {
-                m->v4.olsr_msgsize -= 2 * olsr_cnf->ipsize;
-            }
-            else {
-                m->v6.olsr_msgsize -= 2 * olsr_cnf->ipsize;
-            }
+
+            /* update the message size */
+            temp_msgsize = olsr_msgsize_p;
+            olsr_msgsize -= 2 * olsr_cnf->ipsize;
+            pkt_put_u16(&temp_msgsize, olsr_msgsize);
             continue;
         }
         return false;
     }
   }
-	return true;
+  return true;
 }
 
-void olsrd_drophna_init() {
+void olsrd_drophna_init(void) {
 }
