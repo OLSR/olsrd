@@ -46,11 +46,15 @@
 #include "olsrd_plugin.h"
 #include "defs.h"
 #include "olsrd_drophna.h"
+#include "parser.h"
+
+static void my_init(void) __attribute__ ((constructor));
+static void my_fini(void) __attribute__ ((destructor));
 
 /* Parser function to register with the scheduler */
 bool olsrd_drophna_parser(
     union olsr_message *,
-    struct interface *,
+    struct interface_olsr *,
     union olsr_ip_addr *
     );
 
@@ -58,6 +62,7 @@ int olsrd_plugin_init(void) {
   olsr_parser_add_function(&olsrd_drophna_parser, HNA_MESSAGE);
   return 0;
 }
+void olsr_plugin_exit(void);
 void olsr_plugin_exit(void) {}
 
 /**

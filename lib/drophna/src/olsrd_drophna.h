@@ -52,8 +52,10 @@
 #define MOD_DESC PLUGIN_NAME      " " PLUGIN_VERSION
 #define PLUGIN_INTERFACE_VERSION  5
 
-void olsrd_drophna_init();
-
+void olsrd_drophna_init(void);
+bool olsrd_drophna_parser(union olsr_message *m,
+		struct interface_olsr *in_if,
+		union olsr_ip_addr *ipaddr);
 
 
 #endif /* _DROPHNA_H*/
