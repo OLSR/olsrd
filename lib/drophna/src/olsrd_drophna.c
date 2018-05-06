@@ -100,11 +100,10 @@ olsrd_drophna_parser(
   olsr_reltime vtime;
   uint16_t olsr_msgsize;
   union olsr_ip_addr originator;
-  uint8_t hop_count;
-  uint16_t msg_seq_number;
 
   int hnasize;
-  const uint8_t *curr, *curr_end, *olsr_msgsize_p;
+  const uint8_t *curr, *curr_end;
+  uint8_t *olsr_msgsize_p, *curr_hna, *temp_msgsize;
 
   struct ipaddr_str buf;
 #ifdef DEBUG
@@ -127,11 +126,7 @@ olsrd_drophna_parser(
   pkt_get_reltime(&curr, &vtime);
 
   /* olsr_msgsize */
-  olsr_msgsize_p = curr;
   pkt_get_u16(&curr, &olsr_msgsize);
-
-  hnasize = olsr_msgsize - 8 - olsr_cnf->ipsize;
-  curr_end = (const uint8_t *)m + olsr_msgsize;
 
   /* validate originator */
   pkt_get_ipaddress(&curr, &originator);
@@ -141,10 +136,16 @@ olsrd_drophna_parser(
   pkt_ignore_u8(&curr);
 
   /* hopcnt */
-  pkt_get_u8(&curr, &hop_count);
+  pkt_ignore_u8(&curr);
 
   /* seqno */
-  pkt_get_u16(&curr, &msg_seq_number);
+  pkt_ignore_u16(&curr);
+
+  /* msgtype(1) + vtime(1) + msgsize(2) + ttl(1) + hopcnt(1) + seqno(2) = 8 */
+  olsr_msgsize_p = (uint8_t *)m + 2;
+  curr_hna = (uint8_t *)m + 8 + olsr_cnf->ipsize;
+  curr_end = (const uint8_t *)m + olsr_msgsize;
+  hnasize = olsr_msgsize - 8 - olsr_cnf->ipsize;
 
   if ((hnasize % (2 * olsr_cnf->ipsize)) != 0) {
     OLSR_PRINTF(1, "Illegal HNA message from %s with size %d!\n",
@@ -161,22 +162,24 @@ olsrd_drophna_parser(
     prefix.prefix_len = olsr_netmask_to_prefix(&mask);
 
     if (is_prefix_inetgw(&prefix)) {
-        hnasize -= 2 * olsr_cnf->ipsize;
-        if (0 < hnasize) {
-            uint8_t *dest, *temp_msgsize;
-            /* move the rest of the message forward over the gw HNA */
-            dest = curr - 2 * olsr_cnf->ipsize;
-            memmove(dest, curr, curr_end - curr);
-            curr_end -= 2 * olsr_cnf->ipsize;
-            curr = dest;
+      hnasize -= 2 * olsr_cnf->ipsize;
+      if (0 < hnasize) {
+        /* move the rest of the message forward over the gw HNA */
+        memmove(curr_hna, curr, curr_end - curr);
+        curr_end -= 2 * olsr_cnf->ipsize;
+        curr = curr_hna;
 
-            /* update the message size */
-            temp_msgsize = olsr_msgsize_p;
-            olsr_msgsize -= 2 * olsr_cnf->ipsize;
-            pkt_put_u16(&temp_msgsize, olsr_msgsize);
-            continue;
-        }
-        return false;
+        /* update the message size */
+        temp_msgsize = olsr_msgsize_p;
+        olsr_msgsize -= 2 * olsr_cnf->ipsize;
+        pkt_put_u16(&temp_msgsize, olsr_msgsize);
+        continue;
+      }
+      return false;
+    }
+    else
+    {
+      curr_hna += 2 * olsr_cnf->ipsize;
     }
   }
   return true;
