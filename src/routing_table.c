@@ -371,6 +371,18 @@ olsr_delete_rt_path(struct rt_path *rtp)
     current_inetgw = NULL;
   }
 
+  /* remove reference from rt_best */
+  struct rt_entry* rt;
+  OLSR_FOR_ALL_RT_ENTRIES(rt)
+  if(rt->rt_best == rtp){
+    rt->rt_best = NULL;
+    OLSR_PRINTF(7, "Removed rt_best.\n");
+    /* rt_path is not referenced by multiple rt_entry's.
+     * If rt_path is found for a rt_entry, we can break from the loop traversing all rt entries. */
+    break;
+  }
+  OLSR_FOR_ALL_RT_ENTRIES_END(rt)
+
   olsr_cookie_free(rtp_mem_cookie, rtp);
 }
 
