@@ -8,7 +8,7 @@ message over the gateway announcement and updating the message size.
 
 An example setup would be a vpn server used to interconnect mesh
 islands. Routing to all nodes work, but none of the connected
-islands receive gateway announcemens from another island.
+islands receive gateway announcements from another island.
 
 ---------------------------------------------------------------------
 PLUGIN PARAMETERS (PlParam)
