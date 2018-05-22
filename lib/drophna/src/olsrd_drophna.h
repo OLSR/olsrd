@@ -42,8 +42,7 @@
 #ifndef LIB_DROPHNA_SRC_OLSRD_DROPHNA_H_
 #define LIB_DROPHNA_SRC_OLSRD_DROPHNA_H_
 
-#include "olsr_types.h"
-#include "lq_packet.h"
+#include "link_set.h"
 
 void olsrd_drophna_init(void);
 bool olsrd_drophna_parser(union olsr_message *m,

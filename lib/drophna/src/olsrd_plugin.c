@@ -44,9 +44,6 @@
  */
 
 #include "olsrd_plugin.h"
-#include "plugin_util.h"
-#include "olsr.h"
-#include "defs.h"
 #include "olsrd_drophna.h"
 #include "parser.h"
 #include "builddata.h"

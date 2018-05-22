@@ -38,44 +38,6 @@
  *
  */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-
-/* System includes */
-#include <stddef.h>             /* NULL */
-#include <sys/types.h>          /* ssize_t */
-#include <string.h>             /* strerror() */
-#include <stdarg.h>             /* va_list, va_start, va_end */
-#include <errno.h>              /* errno */
-#include <assert.h>             /* assert() */
-#include <unistd.h>
-#include <fcntl.h>
-#include <linux/if_ether.h>     /* ETH_P_IP */
-#include <linux/if_packet.h>    /* struct sockaddr_ll, PACKET_MULTICAST */
-#include <signal.h>             /* sigset_t, sigfillset(), sigdelset(), SIGINT */
-#include <netinet/ip.h>         /* struct ip */
-#include <netinet/udp.h>        /* struct udphdr */
-#include <unistd.h>             /* close() */
-
-#include <netinet/in.h>
-#include <netinet/ip6.h>
-
-#include <time.h>
-
-/* OLSRD includes */
-#include "plugin_util.h"        /* set_plugin_int */
-#include "defs.h"               /* olsr_cnf, //OLSR_PRINTF */
-#include "ipcalc.h"
-#include "olsr.h"               /* //OLSR_PRINTF */
-#include "mid_set.h"            /* mid_lookup_main_addr() */
-#include "link_set.h"           /* get_best_link_to_neighbor() */
-#include "net_olsr.h"           /* ipequal */
-#include "parser.h"
-
 #include "olsrd_drophna.h"
 
 /* -------------------------------------------------------------------------
