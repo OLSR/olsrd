@@ -85,8 +85,8 @@ endif
 
 install: all
 	$(INSTALL_LIB)
-	mkdir -p "$(ETCDIR)"
-	cp "$(RESOURCESDIR)/olsrd.sgw.speed.conf" "$(ETCDIR)"
+	mkdir -p "${TOPDIR}$(ETCDIR)"
+	cp "$(RESOURCESDIR)/olsrd.sgw.speed.conf" "${TOPDIR}$(ETCDIR)"
 	$(STRIP) "$(LIBDIR)/$(PLUGIN_FULLNAME)"
 
 uninstall:

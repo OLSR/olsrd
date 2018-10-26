@@ -94,7 +94,7 @@ endif
 cfgparser:	$(CFGDEPS) src/builddata.o
 		$(MAKECMDPREFIX)$(MAKECMD) -C $(CFGDIR)
 
-switch:		
+switch:
 	$(MAKECMDPREFIX)$(MAKECMD) -C $(SWITCHDIR)
 
 # generate it always
@@ -174,12 +174,12 @@ install_olsrd:	install_bin
 		@echo per default.
 		@echo can be found at files/olsrd.conf.default.lq
 		@echo ==========================================================
-		mkdir -p $(ETCDIR)
-		$(MAKECMDPREFIX)if [ -e $(CFGFILE) ]; then \
-			cp -f files/olsrd.conf.default.lq $(CFGFILE).new; \
+		mkdir -p ${TOPDIR}$(ETCDIR)
+		$(MAKECMDPREFIX)if [ -e ${TOPDIR}$(CFGFILE) ]; then \
+			cp -f files/olsrd.conf.default.lq ${TOPDIR}$(CFGFILE).new; \
 			echo "Configuration file was saved as $(CFGFILE).new"; \
 		else \
-			cp -f files/olsrd.conf.default.lq $(CFGFILE); \
+			cp -f files/olsrd.conf.default.lq ${TOPDIR}$(CFGFILE); \
 		fi
 		@echo -------------------------------------------
 		@echo Edit $(CFGFILE) before running olsrd!!

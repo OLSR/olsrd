@@ -125,8 +125,8 @@ install: all
 	$(MAKECMDPREFIX)$(MAKE) -C "$(NMEALIB_PATH)" DESTDIR="$(DESTDIR)" install
 	$(MAKECMDPREFIX)$(MAKE) -C "$(LIBRARY_PATH)" DESTDIR="$(DESTDIR)" install
 	$(INSTALL_LIB)
-	mkdir -p "$(ETCDIR)"
-	cp "$(RESOURCESDIR)/olsrd.pud.position.conf" "$(ETCDIR)"
+	mkdir -p "${TOPDIR}$(ETCDIR)"
+	cp "$(RESOURCESDIR)/olsrd.pud.position.conf" "${TOPDIR}$(ETCDIR)"
 	$(STRIP) "$(LIBDIR)/$(PLUGIN_FULLNAME)"
 
 uninstall:
