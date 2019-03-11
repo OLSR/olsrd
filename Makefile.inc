@@ -108,6 +108,7 @@ STRIP ?=  :
 endif
 BISON ?=	bison
 FLEX ?=		flex
+LDCONFIG ?=	/sbin/ldconfig
 TAGCMD ?=	etags
 
 # target directories and names

@@ -356,7 +356,7 @@ install: all
 	mkdir -v -p "$(LIBDIR)"
 	cp "$(LIBDIR_BUILD)/$(SONAME)" "$(LIBDIR)/$(SONAME).$(PLUGIN_VER)"
 	$(STRIP) "$(LIBDIR)/$(SONAME).$(PLUGIN_VER)"
-	/sbin/ldconfig -n "$(LIBDIR)"
+	$(LDCONFIG) -n "$(LIBDIR)"
 	mkdir -v -p "$(SHAREJAVADIR)"
 	cp -t "$(SHAREJAVADIR)" \
       "$(LIBDIR_BUILD)/$(PROJECT).jar" \
@@ -366,7 +366,7 @@ install: all
 uninstall:
 	rm -f "$(LIBDIR)/$(SONAME)" \
 	      "$(LIBDIR)/$(SONAME).$(PLUGIN_VER)"
-	/sbin/ldconfig -n "$(LIBDIR)"
+	$(LDCONFIG) -n "$(LIBDIR)"
 	rmdir -v -p --ignore-fail-on-non-empty "$(LIBDIR)"
 	rm -f "$(SHAREJAVADIR)/$(PROJECT).jar" \
           "$(SHAREJAVADIR)/$(PROJECT)-src.zip" \
