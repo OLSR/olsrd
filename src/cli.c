@@ -123,6 +123,7 @@ int olsr_process_arguments(int argc, char *argv[], struct olsrd_config *cnf, str
      */
     if (strcmp(*argv, "-ipv6") == 0) {
       cnf->ip_version = AF_INET6;
+      cnf->ipsize = 16;
       continue;
     }
 
