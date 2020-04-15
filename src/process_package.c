@@ -370,6 +370,9 @@ deserialize_hello(struct hello_message *hello, const void *ser)
 
       limit2 += size2;
 
+      if (size2 == 0)
+        return 1;
+
       if (EXTRACT_LINK(link_code) != LINK_ORDER[idx]) {
         curr = limit2;
         continue;
