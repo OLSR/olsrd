@@ -558,6 +558,9 @@ olsr_insert_routing_table(union olsr_ip_addr *dst, int plen, union olsr_ip_addr 
    */
   tc = olsr_locate_tc_entry(originator);
 
+  if (tc == NULL)
+    return NULL;
+
   /*
    * first check if there is a rt_path for the prefix.
    */
