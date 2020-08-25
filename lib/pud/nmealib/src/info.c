@@ -172,7 +172,7 @@ bool nmeaTimeParseDate(const char *s, NmeaTime *date) {
 void nmeaTimeSet(NmeaTime *utc, uint32_t *present, struct timeval *timeval) {
   struct timeval tv;
   struct tm tm;
-  long usec;
+  time_t usec;
 
   if (!utc) {
     return;
