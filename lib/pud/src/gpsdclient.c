@@ -370,7 +370,11 @@ void nmeaInfoFromGpsd(struct gps_data_t *gpsdata, NmeaInfo *info, struct GpsdCon
           );
 
   gpsdata->set &= ~STATUS_SET; /* always valid */
+  #if GPSD_API_MAJOR_VERSION >= 10
+  if (gpsdata->fix.status == STATUS_NO_FIX) {
+  #else
   if (gpsdata->status == STATUS_NO_FIX) {
+  #endif
     nmeaInfoClear(info);
     nmeaTimeSet(&info->utc, &info->present, NULL);
     return;
