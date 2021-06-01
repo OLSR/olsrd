@@ -67,7 +67,7 @@
 #include <netinet/ip.h> /* struct ip */
 #include <netinet/udp.h> /* struct udphdr */
 #include <unistd.h> /* read(), write() */
-#include <sys/poll.h> /* Daniele Lacamera: Added guard poll for sendto(), needs poll.h */
+#include <poll.h> /* Daniele Lacamera: Added guard poll for sendto(), needs poll.h */
 
 /* OLSRD includes */
 #include "plugin_util.h" /* set_plugin_int */
