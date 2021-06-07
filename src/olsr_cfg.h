@@ -72,7 +72,7 @@
 #define DEF_IPC_CONNECTIONS  0
 #define DEF_USE_HYST         false
 #define DEF_FIB_METRIC       FIBM_FLAT
-#define DEF_FIB_METRIC_DEFAULT            2
+#define DEF_FIB_METRIC_DEFAULT            9
 #define DEF_LQ_LEVEL         2
 #define DEF_LQ_ALGORITHM     "etx_ff"
 #define DEF_LQ_FISH          1
