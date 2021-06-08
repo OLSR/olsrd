@@ -115,6 +115,9 @@ add_del_route(const struct rt_entry *rt, int add)
   rtm->rtm_flags = olsr_rt_flags(rt, add);
   rtm->rtm_pid = OLSR_PID;
   rtm->rtm_seq = ++seq;
+#if defined(__OpenBSD__)
+  rtm->rtm_tableid = getrtable();
+#endif
 
   /* walk to the end of the header */
   walker = buff + sizeof(struct rt_msghdr);
@@ -228,6 +231,9 @@ add_del_route(const struct rt_entry *rt, int add)
     drtm->rtm_index = 0;
     drtm->rtm_flags = olsr_rt_flags(rt, 0);
     drtm->rtm_seq = ++seq;
+#if defined(__OpenBSD__)
+    drtm->rtm_tableid = getrtable();
+#endif
 
     walker = dbuff + sizeof(struct rt_msghdr);
     sin4.sin_addr = rt->rt_dst.prefix.v4;
@@ -309,6 +315,9 @@ add_del_route6(const struct rt_entry *rt, int add)
   rtm->rtm_flags = olsr_rt_flags(rt, add);
   rtm->rtm_pid = OLSR_PID;
   rtm->rtm_seq = ++seq;
+#if defined(__OpenBSD__)
+  rtm->rtm_tableid = getrtable();
+#endif
 
   /* walk to the end of the header */
   walker = buff + sizeof(struct rt_msghdr);
@@ -390,6 +399,9 @@ add_del_route6(const struct rt_entry *rt, int add)
     drtm->rtm_index = 0;
     drtm->rtm_flags = olsr_rt_flags(rt, 0);
     drtm->rtm_seq = ++seq;
+#if defined(__OpenBSD__)
+    drtm->rtm_tableid = getrtable();
+#endif
 
     walker = dbuff + sizeof(struct rt_msghdr);
     memcpy(&sin6.sin6_addr.s6_addr, &rt->rt_dst.prefix.v6, sizeof(struct in6_addr));
