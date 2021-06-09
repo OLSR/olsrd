@@ -98,6 +98,21 @@ static INLINE int64_t gw_default_calc_threshold(int64_t path_cost) {
 }
 
 /**
+ * A verbose shim around ip_prefix_list_match(olsr_cnf->smart_gw_blacklist, &gw->originator).
+ */
+static bool isGwBlacklisted(struct gateway_entry *gw) {
+  static struct ipaddr_str buf;
+  struct ip_prefix_list *blacklisted;
+  blacklisted = ip_prefix_list_match(olsr_cnf->smart_gw_blacklist, &gw->originator);
+  if (blacklisted) {
+    OLSR_PRINTF(2, "Not considering SmartGateway: %s matches SmartGatewayBlacklist entry %s\n",
+                olsr_ip_to_string(&buf, &gw->originator),
+                olsr_ip_prefix_to_string(&blacklisted->net));
+  }
+  return blacklisted;
+}
+
+/**
  * Look through the gateway list and select the best gateway
  * depending on the costs
  */
@@ -138,7 +153,8 @@ static void gw_default_choose_gateway(void) {
     if (gw_def_choose_new_ipv4_gw) {
       bool gw_eligible_v4 = isGwSelectable(gw, false) ;
       if (gw_eligible_v4 && gw_cost < (chosen_gw_ipv4 ? chosen_gw_ipv4->path_cost : INT64_MAX)
-          && (!cost_ipv4_threshold_valid || (gw_cost < cost_ipv4_threshold))) {
+          && (!cost_ipv4_threshold_valid || (gw_cost < cost_ipv4_threshold))
+          && !isGwBlacklisted(gw)) {
         chosen_gw_ipv4 = gw;
       }
     }
@@ -146,7 +162,8 @@ static void gw_default_choose_gateway(void) {
     if (gw_def_choose_new_ipv6_gw) {
       bool gw_eligible_v6 = isGwSelectable(gw, true);
       if (gw_eligible_v6 && gw_cost < (chosen_gw_ipv6 ? chosen_gw_ipv6->path_cost : INT64_MAX)
-          && (!cost_ipv6_threshold_valid || (gw_cost < cost_ipv6_threshold))) {
+          && (!cost_ipv6_threshold_valid || (gw_cost < cost_ipv6_threshold))
+          && !isGwBlacklisted(gw)) {
         chosen_gw_ipv6 = gw;
       }
     }

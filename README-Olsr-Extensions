@@ -348,6 +348,12 @@ All other parameters will be ignored if SmartGateway is set to "no"
    and its ETX is below the value of this setting then the resulting gateway
    costs are equal to the ETX, otherwise the normal calculation of the
    gateway costs applies (default is 2560).
+16-SmartGatewayBlacklist: List of IPv4 and/or IPv6 addresses to never pick as
+   gateway; address ranges in slash-notation (10.20.0.0/16 or ca:ff:ee::1/64)
+   are also allowed to exclude entire subnets. If you know that a particular
+   gateway is currently broken even though it is still actively advertising its
+   uplink on the mesh, add it to the blacklist to never choose it no matter how
+   good its rating may appear.
 
    If SmartGatewayDividerEtx is zero then no weighing is performed (classical
    behaviour). Classical behaviour only takes ETX costs into account when

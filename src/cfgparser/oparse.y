@@ -247,6 +247,7 @@ static int add_ipv6_addr(YYSTYPE ipaddr_arg, YYSTYPE prefixlen_arg)
 %token TOK_SMART_GW_UPLINK_NAT
 %token TOK_SMART_GW_SPEED
 %token TOK_SMART_GW_PREFIX
+%token TOK_SMART_GW_BLACKLIST
 %token TOK_SRC_IP_ROUTES
 %token TOK_MAIN_IP
 %token TOK_SET_IPFORWARD
@@ -354,6 +355,7 @@ stmt:       idebug
 block:      TOK_HNA4 hna4body
           | TOK_HNA6 hna6body
           | TOK_IPCCON ipcbody
+          | TOK_SMART_GW_BLACKLIST smart_gw_blacklist_body
           | ifdblock ifdbody
           | ifblock ifbody
           | plblock plbody
@@ -389,6 +391,16 @@ ipcstmt:  vcomment
           | imaxipc
           | ipchost
           | ipcnet
+;
+
+smart_gw_blacklist_body:       TOK_OPEN smart_gw_blacklist_stmts TOK_CLOSE
+;
+
+smart_gw_blacklist_stmts: | smart_gw_blacklist_stmts smart_gw_blacklist_stmt
+;
+
+smart_gw_blacklist_stmt:  vcomment
+         | ismart_gw_blacklist_entry
 ;
 
 ifblock:   ifstart ifnicks
@@ -968,6 +980,88 @@ ihna6entry:     TOK_IPV6_ADDR TOK_INTEGER
   if (add_ipv6_addr($1, $3)) {
     YYABORT;
   }
+}
+;
+
+ismart_gw_blacklist_entry:     TOK_IPV4_ADDR
+{
+  union olsr_ip_addr ipaddr;
+  PARSER_DEBUG_PRINTF("SmartGatewayBlacklist entry: %s/32\n", $1->string);
+
+  if (inet_pton(AF_INET, $1->string, &ipaddr.v4) <= 0) {
+    fprintf(stderr, "ismart_gw_blacklist_entry: Failed converting IPv4 address %s\n", $1->string);
+    YYABORT;
+  }
+
+  ip_prefix_list_add(&olsr_cnf->smart_gw_blacklist, &ipaddr, 32);
+
+  free($1->string);
+  free($1);
+}
+        |       TOK_IPV4_ADDR TOK_SLASH TOK_INTEGER
+{
+  union olsr_ip_addr ipaddr;
+
+  PARSER_DEBUG_PRINTF("SmartGatewayBlacklist entry: %s/%d\n", $1->string, $3->integer);
+
+  if (inet_pton(AF_INET, $1->string, &ipaddr.v4) <= 0) {
+    fprintf(stderr, "ismart_gw_blacklist_entry: Failed converting IPv4 address %s\n", $1->string);
+    YYABORT;
+  }
+  if ($3->integer == 0) {
+    fprintf(stderr, "WARNING: ismart_gw_blacklist_entry: '%s/%d' blacklists *all* IPv4 gateways.\n",
+            $1->string, $3->integer);
+  }
+  if ($3->integer > olsr_cnf->maxplen) {
+    fprintf(stderr, "ismart_gw_blacklist_entry: Illegal IPv4 prefix length %d > %d is not allowed!\n", $3->integer, olsr_cnf->maxplen);
+    YYABORT;
+  }
+
+  ip_prefix_list_add(&olsr_cnf->smart_gw_blacklist, &ipaddr, $3->integer);
+
+  free($1->string);
+  free($1);
+  free($3);
+}
+        |       TOK_IPV6_ADDR
+{
+  union olsr_ip_addr ipaddr;
+  PARSER_DEBUG_PRINTF("SmartGatewayBlacklist entry: %s/128\n", $1->string);
+
+  if(inet_pton(AF_INET6, $1->string, &ipaddr) <= 0) {
+    fprintf(stderr, "ismart_gw_blacklist_entry: Failed converting IPv6 address %s\n", $1->string);
+    YYABORT;
+  }
+
+  ip_prefix_list_add(&olsr_cnf->smart_gw_blacklist, &ipaddr, 128);
+
+  free($1->string);
+  free($1);
+}
+        |       TOK_IPV6_ADDR TOK_SLASH TOK_INTEGER
+{
+  union olsr_ip_addr ipaddr;
+  PARSER_DEBUG_PRINTF("SmartGatewayBlacklist entry: %s/%d\n", $1->string, $3->integer);
+
+  if(inet_pton(AF_INET6, $1->string, &ipaddr) <= 0) {
+    fprintf(stderr, "ismart_gw_blacklist_entry: Failed converting IPv6 address %s\n", $1->string);
+    YYABORT;
+  }
+
+  if ($3->integer == 0) {
+    fprintf(stderr, "WARNING: ismart_gw_blacklist_entry: '%s/%d' blacklists *all* IPv6 gateways.\n",
+            $1->string, $3->integer);
+  }
+  if ($3->integer > 128) {
+    fprintf(stderr, "ismart_gw_blacklist_entry: Illegal IPv6 prefix length %d\n", $2->integer);
+    YYABORT;
+  }
+
+  ip_prefix_list_add(&olsr_cnf->smart_gw_blacklist, &ipaddr, $3->integer);
+
+  free($1->string);
+  free($1);
+  free($3);
 }
 ;
 

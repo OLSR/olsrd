@@ -1522,6 +1522,18 @@ ip_prefix_list_find(struct ip_prefix_list *list, const union olsr_ip_addr *net, 
   return NULL;
 }
 
+struct ip_prefix_list *
+ip_prefix_list_match(struct ip_prefix_list *list, const union olsr_ip_addr *addr)
+{
+  struct ip_prefix_list *h;
+  for (h = list; h != NULL; h = h->next) {
+    if (ip_in_net(addr, &h->net)) {
+      return h;
+    }
+  }
+  return NULL;
+}
+
 void set_derived_cnf(struct olsrd_config * cnf) {
   if (!cnf->lock_file) {
     cnf->lock_file = olsrd_get_default_lockfile(cnf);
