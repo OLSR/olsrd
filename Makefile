@@ -94,7 +94,7 @@ endif
 cfgparser:	$(CFGDEPS) src/builddata.o
 		$(MAKECMDPREFIX)$(MAKECMD) -C $(CFGDIR)
 
-switch:		
+switch:
 	$(MAKECMDPREFIX)$(MAKECMD) -C $(SWITCHDIR)
 
 # generate it always
@@ -174,12 +174,12 @@ install_olsrd:	install_bin
 		@echo per default.
 		@echo can be found at files/olsrd.conf.default.lq
 		@echo ==========================================================
-		mkdir -p $(ETCDIR)
-		$(MAKECMDPREFIX)if [ -e $(CFGFILE) ]; then \
-			cp -f files/olsrd.conf.default.lq $(CFGFILE).new; \
+		mkdir -p ${TOPDIR}$(ETCDIR)
+		$(MAKECMDPREFIX)if [ -e ${TOPDIR}$(CFGFILE) ]; then \
+			cp -f files/olsrd.conf.default.lq ${TOPDIR}$(CFGFILE).new; \
 			echo "Configuration file was saved as $(CFGFILE).new"; \
 		else \
-			cp -f files/olsrd.conf.default.lq $(CFGFILE); \
+			cp -f files/olsrd.conf.default.lq ${TOPDIR}$(CFGFILE); \
 		fi
 		@echo -------------------------------------------
 		@echo Edit $(CFGFILE) before running olsrd!!
@@ -234,7 +234,7 @@ rpm:
 
 # This is quite ugly but at least it works
 ifeq ($(OS),linux)
-SUBDIRS := arprefresh bmf dot_draw dyn_gw dyn_gw_plain httpinfo info jsoninfo mdns mini nameservice netjson poprouting p2pd pgraph pud quagga secure sgwdynspeed txtinfo watchdog
+SUBDIRS := arprefresh bmf dot_draw drophna dyn_gw dyn_gw_plain httpinfo info jsoninfo mdns mini nameservice netjson poprouting p2pd pgraph pud quagga secure sgwdynspeed txtinfo watchdog
 else
 ifeq ($(OS),win32)
 SUBDIRS := dot_draw httpinfo info jsoninfo mini netjson pgraph secure txtinfo
@@ -312,6 +312,18 @@ dot_draw_install:
 
 dot_draw_uninstall:
 		$(MAKECMDPREFIX)$(MAKECMD) -C lib/dot_draw DESTDIR=$(DESTDIR) uninstall
+
+drophna:
+	                $(MAKECMDPREFIX)$(MAKECMD) -C lib/drophna
+
+drophna_clean:
+	                $(MAKECMDPREFIX)$(MAKECMD) -C lib/drophna DESTDIR=$(DESTDIR) clean
+
+drophna_install:
+	                $(MAKECMDPREFIX)$(MAKECMD) -C lib/drophna DESTDIR=$(DESTDIR) install
+
+drophna_uninstall:
+	                $(MAKECMDPREFIX)$(MAKECMD) -C lib/drophna DESTDIR=$(DESTDIR) uninstall
 
 dyn_gw:
 		$(MAKECMDPREFIX)$(MAKECMD) -C lib/dyn_gw

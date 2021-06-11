@@ -1,10 +1,5 @@
-# The olsr.org Optimized Link-State Routing daemon (olsrd)
-#
-# (c) by the OLSR project
-#
-# See our Git repository to find out who worked on this file
-# and thus is a copyright holder on it.
-#
+# The olsr.org Optimized Link-State Routing daemon(olsrd)
+# Copyright (c) 2014, Philipp Borgers <borgers@mi.fu-berlin.de>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -41,78 +36,27 @@
 # the copyright holders.
 #
 
-include Makefile.inc
+OLSRD_PLUGIN =	true
+PLUGIN_NAME =	olsrd_drophna
+PLUGIN_VER =	0.0.0
 
-TOPDIR = ../..
+TOPDIR =	../..
 include $(TOPDIR)/Makefile.inc
-
-
-RESOURCESDIR = ./resources
-
-SUPPORTED = 0
-ifeq ($(OS),linux)
-SUPPORTED = 1
-endif
-ifeq ($(OS),android)
-SUPPORTED = 1
-endif
-
-
-ifeq ($(SUPPORTED),0)
-
-.PHONY: all default_target install clean
-
-all: default_target
-
-default_target install clean:
-	@echo "*** $(PLUGIN_NAME) plugin not supported on $(OS), sorry!"
-
-else
-
-CFLAGS += -DPLUGIN_VER=\"$(PLUGIN_VER)\"
-
-.PHONY: all default_target install uninstall clean doc doc-clean java java-instal java-uninstall
-
-all: default_target
 
 default_target: $(PLUGIN_FULLNAME)
 
 $(PLUGIN_FULLNAME): $(OBJS) version-script.txt
 ifeq ($(VERBOSE),0)
-	@echo "[LD] $@"
+		@echo "[LD] $@"
 endif
-	$(MAKECMDPREFIX)$(CC) $(LDFLAGS) -o $(PLUGIN_FULLNAME) $(OBJS) $(LIBS)
+		$(MAKECMDPREFIX)$(CC) $(LDFLAGS) -o $(PLUGIN_FULLNAME) $(OBJS) $(LIBS)
 
-install: all
-	$(INSTALL_LIB)
-	mkdir -p "${TOPDIR}$(ETCDIR)"
-	cp "$(RESOURCESDIR)/olsrd.sgw.speed.conf" "${TOPDIR}$(ETCDIR)"
-	$(STRIP) "$(LIBDIR)/$(PLUGIN_FULLNAME)"
-ifneq ($(DOCDIR_OLSRD),)
-	mkdir -p "$(DOCDIR_OLSRD)"
-	cp "README_SGWDYNSPEED" "$(DOCDIR_OLSRD)"
-endif
+install:	$(PLUGIN_FULLNAME)
+		$(STRIP) $(PLUGIN_FULLNAME)
+		$(INSTALL_LIB)
 
 uninstall:
-ifneq ($(DOCDIR_OLSRD),)
-	rm -f "$(DOCDIR_OLSRD)/README_SGWDYNSPEED"
-	rmdir -p --ignore-fail-on-non-empty "$(DOCDIR_OLSRD)"
-endif
-	rm -f "$(LIBDIR)/lib$(PLUGIN_NAME).so" "$(LIBDIR)/$(PLUGIN_NAME)" "$(ETCDIR)/olsrd.sgw.speed.conf"
-	$(UNINSTALL_LIB)
-	rmdir -v -p --ignore-fail-on-non-empty "$(LIBDIR)" "$(ETCDIR)"
+		$(UNINSTALL_LIB)
 
 clean:
-ifeq ($(VERBOSE),0)
-	@echo "[$@]"
-endif
-	$(MAKECMDPREFIX)rm -f $(OBJS) $(SRCS:%.c=%.d) "$(PLUGIN_FULLNAME)"
-	$(MAKECMDPREFIX)$(MAKE) -C doc clean
-
-doc:
-	$(MAKECMDPREFIX)$(MAKE) -C doc all
-
-doc-clean:
-	$(MAKECMDPREFIX)$(MAKE) -C doc clean
-
-endif
+		rm -f $(OBJS) $(SRCS:%.c=%.d) $(PLUGIN_FULLNAME)
