@@ -48,7 +48,7 @@
 #include "olsr.h"
 #include "log.h"
 #include "kernel_routes.h"
-#include "common/avl.h"
+#include "common/olsrd_avl.h"
 #include "net_olsr.h"
 #include "tc_set.h"
 #include "olsr_cookie.h"
@@ -289,13 +289,13 @@ static void
 olsr_delete_outdated_routes(struct rt_entry *rt)
 {
   struct rt_path *rtp;
-  struct avl_node *rtp_tree_node, *next_rtp_tree_node;
+  struct olsrd_avl_node *rtp_tree_node, *next_rtp_tree_node;
 
-  for (rtp_tree_node = avl_walk_first(&rt->rt_path_tree); rtp_tree_node != NULL; rtp_tree_node = next_rtp_tree_node) {
+  for (rtp_tree_node = olsrd_avl_walk_first(&rt->rt_path_tree); rtp_tree_node != NULL; rtp_tree_node = next_rtp_tree_node) {
     /*
      * pre-fetch the next node before loosing context.
      */
-    next_rtp_tree_node = avl_walk_next(rtp_tree_node);
+    next_rtp_tree_node = olsrd_avl_walk_next(rtp_tree_node);
 
     rtp = rtp_tree2rtp(rtp_tree_node);
 
@@ -305,7 +305,7 @@ olsr_delete_outdated_routes(struct rt_entry *rt)
      */
     if (routingtree_version != rtp->rtp_version) {
       /* remove from the originator tree */
-      avl_delete(&rt->rt_path_tree, rtp_tree_node);
+      olsrd_avl_delete(&rt->rt_path_tree, rtp_tree_node);
       rtp->rtp_rt = NULL;
 
       if (rt->rt_best == rtp) {
@@ -341,7 +341,7 @@ olsr_update_rib_routes(void)
   
       if (olsr_delete_kernel_route(rt) == 0) {
         /*only remove if deletion was successful*/
-        avl_delete(&routingtree, &rt->rt_tree_node);
+        olsrd_avl_delete(&routingtree, &rt->rt_tree_node);
         olsr_cookie_free(rt_mem_cookie, rt);
       }
 
@@ -370,21 +370,21 @@ olsr_delete_interface_routes(int if_index) {
   OLSR_FOR_ALL_RT_ENTRIES(rt) {
     bool mightTrigger = false;
     struct rt_path *rtp;
-    struct avl_node *rtp_tree_node, *next_rtp_tree_node;
+    struct olsrd_avl_node *rtp_tree_node, *next_rtp_tree_node;
 
     /* run through all routing paths of route */
-    for (rtp_tree_node = avl_walk_first(&rt->rt_path_tree); rtp_tree_node != NULL; rtp_tree_node = next_rtp_tree_node) {
+    for (rtp_tree_node = olsrd_avl_walk_first(&rt->rt_path_tree); rtp_tree_node != NULL; rtp_tree_node = next_rtp_tree_node) {
       /*
        * pre-fetch the next node before loosing context.
        */
-      next_rtp_tree_node = avl_walk_next(rtp_tree_node);
+      next_rtp_tree_node = olsrd_avl_walk_next(rtp_tree_node);
 
       rtp = rtp_tree2rtp(rtp_tree_node);
 
       /* nexthop use lost interface ? */
       if (rtp->rtp_nexthop.iif_index == if_index) {
         /* remove from the originator tree */
-        avl_delete(&rt->rt_path_tree, rtp_tree_node);
+        olsrd_avl_delete(&rt->rt_path_tree, rtp_tree_node);
         rtp->rtp_rt = NULL;
 
         if (rt->rt_best == rtp) {
@@ -397,7 +397,7 @@ olsr_delete_interface_routes(int if_index) {
     if (mightTrigger) {
       if (!rt->rt_path_tree.count) {
         /* oops, all routes are gone - flush the route head */
-        avl_delete(&routingtree, rt_tree_node);
+        olsrd_avl_delete(&routingtree, rt_tree_node);
 
         /* do not dequeue route because they are already gone */
       }

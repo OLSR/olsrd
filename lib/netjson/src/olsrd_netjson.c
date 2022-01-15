@@ -52,7 +52,7 @@
 #include "info/info_types.h"
 #include "info/http_headers.h"
 #include "info/json_helpers.h"
-#include "common/avl.h"
+#include "common/olsrd_avl.h"
 #include "olsr.h"
 #include "builddata.h"
 #include "routing_table.h"
@@ -161,7 +161,7 @@ void ipc_print_network_routes(struct autobuf *abuf) {
 }
 
 void ipc_print_network_graph(struct autobuf *abuf) {
-  struct avl_tree nodes;
+  struct olsrd_avl_tree nodes;
   struct mid_entry mid_self;
   struct node_entry * node_self;
   struct tc_entry * tc;
@@ -169,7 +169,7 @@ void ipc_print_network_graph(struct autobuf *abuf) {
   struct neighbor_entry * neighbor;
   int idx;
 
-  avl_init(&nodes, (olsr_cnf->ip_version == AF_INET) ? avl_comp_ipv4 : avl_comp_ipv6);
+  olsrd_avl_init(&nodes, (olsr_cnf->ip_version == AF_INET) ? olsrd_avl_comp_ipv4 : olsrd_avl_comp_ipv6);
 
   /* mandatory */
   abuf_json_string(&json_session, abuf, "type", "NetworkGraph");
@@ -226,8 +226,8 @@ void ipc_print_network_graph(struct autobuf *abuf) {
 
   abuf_json_mark_object(&json_session, true, true, abuf, "nodes");
   while (nodes.count > 0) {
-    struct avl_node *node = avl_walk_first(&nodes);
-    struct node_entry *node_entry = avlnode2node(node);
+    struct olsrd_avl_node *node = olsrd_avl_walk_first(&nodes);
+    struct node_entry *node_entry = olsrd_avlnode2node(node);
 
     if (!node_entry->isAlias) {
       abuf_json_mark_array_entry(&json_session, true, abuf);
@@ -265,7 +265,7 @@ void ipc_print_network_graph(struct autobuf *abuf) {
       netjson_cleanup_mid_self(node_self);
     }
 
-    avl_delete(&nodes, node);
+    olsrd_avl_delete(&nodes, node);
     free(node);
   }
   abuf_json_mark_object(&json_session, false, true, abuf, NULL);

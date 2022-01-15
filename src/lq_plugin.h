@@ -51,7 +51,7 @@
 #include "olsr_spf.h"
 #include "lq_packet.h"
 #include "packet.h"
-#include "common/avl.h"
+#include "common/olsrd_avl.h"
 
 #define LINK_COST_BROKEN (1u<<22)
 #define ROUTE_COST_BROKEN (0xffffffffu)
@@ -97,23 +97,23 @@ struct lq_handler {
 };
 
 struct lq_handler_node {
-  struct avl_node node;
+  struct olsrd_avl_node node;
   struct lq_handler *handler;
   char name[0];
 };
 
-AVLNODE2STRUCT(lq_handler_tree2lq_handler_node, struct lq_handler_node, node);
+OLSRD_AVLNODE2STRUCT(lq_handler_tree2lq_handler_node, struct lq_handler_node, node);
 
 #define OLSR_FOR_ALL_LQ_HANDLERS(lq) \
 { \
-  struct avl_node *lq_tree_node, *next_lq_tree_node; \
-  for (lq_tree_node = avl_walk_first(&lq_handler_tree); \
+  struct olsrd_avl_node *lq_tree_node, *next_lq_tree_node; \
+  for (lq_tree_node = olsrd_avl_walk_first(&lq_handler_tree); \
     lq_tree_node; lq_tree_node = next_lq_tree_node) { \
-    next_lq_tree_node = avl_walk_next(lq_tree_node); \
+    next_lq_tree_node = olsrd_avl_walk_next(lq_tree_node); \
     lq = lq_handler_tree2lq_handler_node(lq_tree_node);
 #define OLSR_FOR_ALL_LQ_HANDLERS_END(tc) }}
 
-int avl_strcasecmp(const void *str1, const void *str2);
+int olsrd_avl_strcasecmp(const void *str1, const void *str2);
 void init_lq_handler_tree(void);
 
 void register_lq_handler(struct lq_handler *handler, const char *name);

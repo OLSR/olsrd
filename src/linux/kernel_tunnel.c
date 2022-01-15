@@ -84,12 +84,12 @@
 
 static bool store_iptunnel_state;
 static struct olsr_cookie_info *tunnel_cookie;
-static struct avl_tree tunnel_tree;
+static struct olsrd_avl_tree tunnel_tree;
 
 int olsr_os_init_iptunnel(const char * dev) {
   tunnel_cookie = olsr_alloc_cookie("iptunnel", OLSR_COOKIE_TYPE_MEMORY);
   olsr_cookie_set_memory_size(tunnel_cookie, sizeof(struct olsr_iptunnel_entry));
-  avl_init(&tunnel_tree, avl_comp_default);
+  olsrd_avl_init(&tunnel_tree, olsrd_avl_comp_default);
 
   store_iptunnel_state = olsr_if_isup(dev);
   if (store_iptunnel_state) {
@@ -107,7 +107,7 @@ void olsr_os_cleanup_iptunnel(const char * dev) {
     struct olsr_iptunnel_entry *t;
 
     /* kill tunnel */
-    t = (struct olsr_iptunnel_entry *)avl_walk_first(&tunnel_tree);
+    t = (struct olsr_iptunnel_entry *)olsrd_avl_walk_first(&tunnel_tree);
     t->usage = 1;
 
     olsr_os_del_ipip_tunnel(t);
@@ -201,7 +201,7 @@ struct olsr_iptunnel_entry *olsr_os_add_ipip_tunnel(union olsr_ip_addr *target, 
 
   assert(olsr_cnf->ip_version == AF_INET6 || transportV4);
 
-  t = (struct olsr_iptunnel_entry *)avl_find(&tunnel_tree, target);
+  t = (struct olsr_iptunnel_entry *)olsrd_avl_find(&tunnel_tree, target);
   if (t == NULL) {
     int if_idx;
     struct ipaddr_str buf;
@@ -228,7 +228,7 @@ struct olsr_iptunnel_entry *olsr_os_add_ipip_tunnel(union olsr_ip_addr *target, 
     strscpy(t->if_name, name, sizeof(t->if_name));
     t->if_index = if_idx;
 
-    avl_insert(&tunnel_tree, &t->node, AVL_DUP_NO);
+    olsrd_avl_insert(&tunnel_tree, &t->node, OLSRD_AVL_DUP_NO);
   }
 
   t->usage++;
@@ -253,7 +253,7 @@ void olsr_os_del_ipip_tunnel(struct olsr_iptunnel_entry *t) {
   olsr_if_set_state(t->if_name, false);
   os_ip_tunnel(t->if_name, NULL);
 
-  avl_delete(&tunnel_tree, &t->node);
+  olsrd_avl_delete(&tunnel_tree, &t->node);
   olsr_cookie_free(tunnel_cookie, t);
 }
 #endif /* __linux__ */

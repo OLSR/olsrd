@@ -48,7 +48,7 @@
 
 #include <stdbool.h>
 
-#include "common/avl.h"
+#include "common/olsrd_avl.h"
 #include "mid_set.h"
 #include "tc_set.h"
 #include "link_set.h"
@@ -56,7 +56,7 @@
 #include "olsr_types.h"
 
 struct node_entry {
-  struct avl_node avl;
+  struct olsrd_avl_node olsrd_avl;
   bool isAlias;
   struct mid_entry *mid;
   struct tc_entry *tc;
@@ -65,15 +65,15 @@ struct node_entry {
   struct neighbor_entry *neighbor;
 };
 
-/* static INLINE struct node_entry * avlnode2node(struct avl_node *ptr) */
-AVLNODE2STRUCT(avlnode2node, struct node_entry, avl);
+/* static INLINE struct node_entry * olsrd_avlnode2node(struct olsrd_avl_node *ptr) */
+OLSRD_AVLNODE2STRUCT(olsrd_avlnode2node, struct node_entry, olsrd_avl);
 
 struct node_entry * netjson_constructMidSelf(struct mid_entry *mid);
 void netjson_cleanup_mid_self(struct node_entry *node_entry);
-void netjson_midIntoNodesTree(struct avl_tree *nodes, struct mid_entry *mid);
-void netjson_tcIntoNodesTree(struct avl_tree *nodes, struct tc_entry *tc);
-void netjson_tcEdgeIntoNodesTree(struct avl_tree *nodes, struct tc_edge_entry *tc_edge);
-void netjson_linkIntoNodesTree(struct avl_tree *nodes, struct link_entry *link, union olsr_ip_addr *addr);
-void netjson_neighborIntoNodesTree(struct avl_tree *nodes, struct neighbor_entry *neigh);
+void netjson_midIntoNodesTree(struct olsrd_avl_tree *nodes, struct mid_entry *mid);
+void netjson_tcIntoNodesTree(struct olsrd_avl_tree *nodes, struct tc_entry *tc);
+void netjson_tcEdgeIntoNodesTree(struct olsrd_avl_tree *nodes, struct tc_edge_entry *tc_edge);
+void netjson_linkIntoNodesTree(struct olsrd_avl_tree *nodes, struct link_entry *link, union olsr_ip_addr *addr);
+void netjson_neighborIntoNodesTree(struct olsrd_avl_tree *nodes, struct neighbor_entry *neigh);
 
 #endif /* LIB_NETJSON_SRC_OLSRD_NETJSON_HELPERS_H_ */

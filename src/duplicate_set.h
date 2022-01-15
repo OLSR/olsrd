@@ -49,7 +49,7 @@
 #include "defs.h"
 #include "olsr.h"
 #include "mantissa.h"
-#include "common/avl.h"
+#include "common/olsrd_avl.h"
 
 #define DUPLICATE_CLEANUP_INTERVAL 15000
 #define DUPLICATE_CLEANUP_JITTER 25
@@ -57,7 +57,7 @@
 #define DUP_MAX_TOO_LOW 16
 
 struct dup_entry {
-  struct avl_node avl;
+  struct olsrd_avl_node olsrd_avl;
   union olsr_ip_addr ip;
   uint16_t seqnr;
   uint16_t too_low_counter;
@@ -65,7 +65,7 @@ struct dup_entry {
   uint32_t valid_until;
 };
 
-AVLNODE2STRUCT(duptree2dupentry, struct dup_entry, avl);
+OLSRD_AVLNODE2STRUCT(duptree2dupentry, struct dup_entry, olsrd_avl);
 
 void olsr_init_duplicate_set(void);
 void olsr_cleanup_duplicates(union olsr_ip_addr *orig);
@@ -80,10 +80,10 @@ void olsr_print_duplicate_table(void);
 
 #define OLSR_FOR_ALL_DUP_ENTRIES(dup) \
 { \
-  struct avl_node *dup_tree_node, *next_dup_tree_node; \
-  for (dup_tree_node = avl_walk_first(&duplicate_set); \
+  struct olsrd_avl_node *dup_tree_node, *next_dup_tree_node; \
+  for (dup_tree_node = olsrd_avl_walk_first(&duplicate_set); \
     dup_tree_node; dup_tree_node = next_dup_tree_node) { \
-    next_dup_tree_node = avl_walk_next(dup_tree_node); \
+    next_dup_tree_node = olsrd_avl_walk_next(dup_tree_node); \
     dup = duptree2dupentry(dup_tree_node);
 #define OLSR_FOR_ALL_DUP_ENTRIES_END(dup) }}
 

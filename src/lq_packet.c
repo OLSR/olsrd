@@ -272,16 +272,16 @@ create_lq_tc(struct lq_tc_message *lq_tc, struct interface_olsr *outif)
 
     /* Queue the neighbour entry. */
 
-    // TODO: ugly hack until neighbor table is ported to avl tree
+    // TODO: ugly hack until neighbor table is ported to olsrd_avl tree
 
-    if (lq_tc->neigh == NULL || avl_comp_default(&lq_tc->neigh->address, &neigh->address) > 0) {
+    if (lq_tc->neigh == NULL || olsrd_avl_comp_default(&lq_tc->neigh->address, &neigh->address) > 0) {
       neigh->next = lq_tc->neigh;
       lq_tc->neigh = neigh;
     } else {
       struct tc_mpr_addr *last = lq_tc->neigh, *n = last->next;
 
       while (n) {
-        if (avl_comp_default(&n->address, &neigh->address) > 0) {
+        if (olsrd_avl_comp_default(&n->address, &neigh->address) > 0) {
           break;
         }
         last = n;

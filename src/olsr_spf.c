@@ -47,7 +47,7 @@
  * Implementation of Dijkstras algorithm. Initially all nodes
  * are initialized to infinite cost. First we put ourselves
  * on the heap of reachable nodes. Our heap implementation
- * is based on an AVL tree which gives interesting performance
+ * is based on an OLSRD_AVL tree which gives interesting performance
  * characteristics for the frequent operations of minimum key
  * extraction and re-keying. Next all neighbors of a node are
  * explored and put on the heap if the cost of reaching them is
@@ -67,7 +67,7 @@
 #include "mid_set.h"
 #include "hna_set.h"
 #include "common/list.h"
-#include "common/avl.h"
+#include "common/olsrd_avl.h"
 #include "olsr_spf.h"
 #include "net_olsr.h"
 #include "lq_plugin.h"
@@ -80,7 +80,7 @@
 struct timer_entry *spf_backoff_timer = NULL;
 
 /*
- * avl_comp_etx
+ * olsrd_avl_comp_etx
  *
  * compare two etx metrics.
  * return 0 if there is an exact match and
@@ -89,7 +89,7 @@ struct timer_entry *spf_backoff_timer = NULL;
  * after compiler optimization.
  */
 static int
-avl_comp_etx(const void *etx1, const void *etx2)
+olsrd_avl_comp_etx(const void *etx1, const void *etx2)
 {
   if (*(const olsr_linkcost *)etx1 < *(const olsr_linkcost *)etx2) {
     return -1;
@@ -108,7 +108,7 @@ avl_comp_etx(const void *etx1, const void *etx2)
  * Key an existing vertex to a candidate tree.
  */
 static void
-olsr_spf_add_cand_tree(struct avl_tree *tree, struct tc_entry *tc)
+olsr_spf_add_cand_tree(struct olsrd_avl_tree *tree, struct tc_entry *tc)
 {
 #if !defined(NODEBUG) && defined(DEBUG)
   struct ipaddr_str buf;
@@ -121,7 +121,7 @@ olsr_spf_add_cand_tree(struct avl_tree *tree, struct tc_entry *tc)
               get_linkcost_text(tc->path_cost, true, &lqbuffer));
 #endif /* DEBUG */
 
-  avl_insert(tree, &tc->cand_tree_node, AVL_DUP);
+  olsrd_avl_insert(tree, &tc->cand_tree_node, OLSRD_AVL_DUP);
 }
 
 /*
@@ -130,7 +130,7 @@ olsr_spf_add_cand_tree(struct avl_tree *tree, struct tc_entry *tc)
  * Unkey an existing vertex from a candidate tree.
  */
 static void
-olsr_spf_del_cand_tree(struct avl_tree *tree, struct tc_entry *tc)
+olsr_spf_del_cand_tree(struct olsrd_avl_tree *tree, struct tc_entry *tc)
 {
 
 #ifdef DEBUG
@@ -142,7 +142,7 @@ olsr_spf_del_cand_tree(struct avl_tree *tree, struct tc_entry *tc)
               get_linkcost_text(tc->path_cost, true, &lqbuffer));
 #endif /* DEBUG */
 
-  avl_delete(tree, &tc->cand_tree_node);
+  olsrd_avl_delete(tree, &tc->cand_tree_node);
 }
 
 /*
@@ -175,9 +175,9 @@ olsr_spf_add_path_list(struct list_node *head, int *path_count, struct tc_entry 
  * return the node with the minimum pathcost.
  */
 static struct tc_entry *
-olsr_spf_extract_best(struct avl_tree *tree)
+olsr_spf_extract_best(struct olsrd_avl_tree *tree)
 {
-  struct avl_node *node = avl_walk_first(tree);
+  struct olsrd_avl_node *node = olsrd_avl_walk_first(tree);
 
   return (node ? cand_tree2tc(node) : NULL);
 }
@@ -190,9 +190,9 @@ olsr_spf_extract_best(struct avl_tree *tree)
  * path cost is better.
  */
 static void
-olsr_spf_relax(struct avl_tree *cand_tree, struct tc_entry *tc)
+olsr_spf_relax(struct olsrd_avl_tree *cand_tree, struct tc_entry *tc)
 {
-  struct avl_node *edge_node;
+  struct olsrd_avl_node *edge_node;
   olsr_linkcost new_cost;
 
 #ifdef DEBUG
@@ -207,7 +207,7 @@ olsr_spf_relax(struct avl_tree *cand_tree, struct tc_entry *tc)
   /*
    * loop through all edges of this vertex.
    */
-  for (edge_node = avl_walk_first(&tc->edge_tree); edge_node; edge_node = avl_walk_next(edge_node)) {
+  for (edge_node = olsrd_avl_walk_first(&tc->edge_tree); edge_node; edge_node = olsrd_avl_walk_next(edge_node)) {
 
     struct tc_entry *new_tc;
     struct tc_edge_entry *tc_edge = edge_tree2tc_edge(edge_node);
@@ -289,7 +289,7 @@ olsr_spf_relax(struct avl_tree *cand_tree, struct tc_entry *tc)
  * on the candidate tree.
  */
 static void
-olsr_spf_run_full(struct avl_tree *cand_tree, struct list_node *path_list, int *path_count)
+olsr_spf_run_full(struct olsrd_avl_tree *cand_tree, struct list_node *path_list, int *path_count)
 {
   struct tc_entry *tc;
 
@@ -335,8 +335,8 @@ olsr_calculate_routing_table(bool force)
 #ifdef SPF_PROFILING
   struct timespec t1, t2, t3, t4, t5, spf_init, spf_run, route, kernel, total;
 #endif /* SPF_PROFILING */
-  struct avl_tree cand_tree;
-  struct avl_node *rtp_tree_node;
+  struct olsrd_avl_tree cand_tree;
+  struct olsrd_avl_node *rtp_tree_node;
   struct list_node path_list;          /* head of the path_list */
   struct tc_entry *tc;
   struct rt_path *rtp;
@@ -362,7 +362,7 @@ olsr_calculate_routing_table(bool force)
   /*
    * Prepare the candidate tree and result list.
    */
-  avl_init(&cand_tree, avl_comp_etx);
+  olsrd_avl_init(&cand_tree, olsrd_avl_comp_etx);
   list_head_init(&path_list);
   olsr_bump_routingtree_version();
 
@@ -493,7 +493,7 @@ olsr_calculate_routing_table(bool force)
      * If the prefix is already in the RIB, refresh the entry such
      * that olsr_delete_outdated_routes() does not purge it off.
      */
-    for (rtp_tree_node = avl_walk_first(&tc->prefix_tree); rtp_tree_node; rtp_tree_node = avl_walk_next(rtp_tree_node)) {
+    for (rtp_tree_node = olsrd_avl_walk_first(&tc->prefix_tree); rtp_tree_node; rtp_tree_node = olsrd_avl_walk_next(rtp_tree_node)) {
 
       rtp = rtp_prefix_tree2rtp(rtp_tree_node);
 

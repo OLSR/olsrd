@@ -45,7 +45,7 @@
 
 #ifdef __linux__
 
-#include "common/avl.h"
+#include "common/olsrd_avl.h"
 #include "defs.h"
 #include "ipcalc.h"
 #include "olsr.h"
@@ -89,7 +89,7 @@ static struct olsr_ip_prefix ipv4_slash_0_route;
 static struct olsr_ip_prefix ipv4_slash_1_routes[2];
 
 /** the gateway tree */
-struct avl_tree gateway_tree;
+struct olsrd_avl_tree gateway_tree;
 
 /** gateway cookie */
 static struct olsr_cookie_info *gateway_entry_mem_cookie = NULL;
@@ -713,7 +713,7 @@ static void cleanup_gateway_handler(void *ptr) {
   }
 
   /* remove gateway entry */
-  avl_delete(&gateway_tree, &gw->node);
+  olsrd_avl_delete(&gateway_tree, &gw->node);
   olsr_cookie_free(gateway_entry_mem_cookie, gw);
 }
 
@@ -837,7 +837,7 @@ int olsr_init_gateways(void) {
   gw_container_entry_mem_cookie = olsr_alloc_cookie("gw_container_entry_mem_cookie", OLSR_COOKIE_TYPE_MEMORY);
   olsr_cookie_set_memory_size(gw_container_entry_mem_cookie, sizeof(struct gw_container_entry));
 
-  avl_init(&gateway_tree, avl_comp_default);
+  olsrd_avl_init(&gateway_tree, olsrd_avl_comp_default);
 
   olsr_gw_list_init(&gw_list_ipv4, olsr_cnf->smart_gw_use_count);
   olsr_gw_list_init(&gw_list_ipv6, olsr_cnf->smart_gw_use_count);
@@ -1078,7 +1078,7 @@ void olsr_cleanup_gateways(void) {
   OLSR_FOR_ALL_GWS_END(gw);
 
   /* there should be no more gateways */
-  assert(!avl_walk_first(&gateway_tree));
+  assert(!olsrd_avl_walk_first(&gateway_tree));
   assert(!current_ipv4_gw);
   assert(!current_ipv6_gw);
 
@@ -1244,14 +1244,14 @@ void olsr_update_gateway_entry(union olsr_ip_addr *originator, union olsr_ip_add
   struct gw_container_entry * new_gw_in_list;
   uint8_t *ptr;
   int64_t prev_path_cost = 0;
-  struct gateway_entry *gw = node2gateway(avl_find(&gateway_tree, originator));
+  struct gateway_entry *gw = node2gateway(olsrd_avl_find(&gateway_tree, originator));
 
   if (!gw) {
     gw = olsr_cookie_malloc(gateway_entry_mem_cookie);
     gw->originator = *originator;
     gw->node.key = &gw->originator;
 
-    avl_insert(&gateway_tree, &gw->node, AVL_DUP_NO);
+    olsrd_avl_insert(&gateway_tree, &gw->node, OLSRD_AVL_DUP_NO);
   } else if (olsr_seqno_diff(seqno, gw->seqno) <= 0) {
     /* ignore older HNAs */
     return;
@@ -1353,7 +1353,7 @@ void olsr_update_gateway_entry(union olsr_ip_addr *originator, union olsr_ip_add
  * gateway tree immediately, else it is removed on a delayed schedule.
  */
 void olsr_delete_gateway_entry(union olsr_ip_addr *originator, uint8_t prefixlen, bool immediate) {
-  olsr_delete_gateway_tree_entry(node2gateway(avl_find(&gateway_tree, originator)), prefixlen, immediate);
+  olsr_delete_gateway_tree_entry(node2gateway(olsrd_avl_find(&gateway_tree, originator)), prefixlen, immediate);
 }
 
 /**
@@ -1526,7 +1526,7 @@ bool olsr_set_inet_gateway(struct gateway_entry * chosen_gw, bool ipv4, bool ipv
     return true;
   }
 
-  new_gw = node2gateway(avl_find(&gateway_tree, &chosen_gw->originator));
+  new_gw = node2gateway(olsrd_avl_find(&gateway_tree, &chosen_gw->originator));
   if (!new_gw) {
     /* the originator is not in the gateway tree, we can't set it as gateway */
     return true;

@@ -65,7 +65,7 @@
 #include "neighbor_table.h"
 #include "log.h"
 #include "lq_packet.h"
-#include "common/avl.h"
+#include "common/olsrd_avl.h"
 #include "net_olsr.h"
 #include "lq_plugin.h"
 #include "gateway.h"
@@ -260,13 +260,13 @@ olsr_init_tables(void)
   changes_neighborhood = false;
   changes_hna = false;
 
-  /* Set avl tree comparator */
+  /* Set olsrd_avl tree comparator */
   if (olsr_cnf->ipsize == 4) {
-    avl_comp_default = avl_comp_ipv4;
-    avl_comp_prefix_default = avl_comp_ipv4_prefix;
+    olsrd_avl_comp_default = olsrd_avl_comp_ipv4;
+    olsrd_avl_comp_prefix_default = olsrd_avl_comp_ipv4_prefix;
   } else {
-    avl_comp_default = avl_comp_ipv6;
-    avl_comp_prefix_default = avl_comp_ipv6_prefix;
+    olsrd_avl_comp_default = olsrd_avl_comp_ipv6;
+    olsrd_avl_comp_prefix_default = olsrd_avl_comp_ipv6_prefix;
   }
 
   /* Initialize lq plugin set */

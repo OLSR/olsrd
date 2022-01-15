@@ -43,44 +43,44 @@
  *
  */
 
-#ifndef _AVL_H
-#define _AVL_H
+#ifndef _OLSRD_AVL_H
+#define _OLSRD_AVL_H
 
 #include <stddef.h>
 #include "compiler.h"
 #include "defs.h"
 
-struct avl_node {
-  struct avl_node *parent;
-  struct avl_node *left;
-  struct avl_node *right;
-  struct avl_node *next;
-  struct avl_node *prev;
+struct olsrd_avl_node {
+  struct olsrd_avl_node *parent;
+  struct olsrd_avl_node *left;
+  struct olsrd_avl_node *right;
+  struct olsrd_avl_node *next;
+  struct olsrd_avl_node *prev;
   void *key;
   signed char balance;
   unsigned char leader;
 };
 
-typedef int (*avl_tree_comp) (const void *, const void *);
+typedef int (*olsrd_avl_tree_comp) (const void *, const void *);
 
-struct avl_tree {
-  struct avl_node *root;
-  struct avl_node *first;
-  struct avl_node *last;
+struct olsrd_avl_tree {
+  struct olsrd_avl_node *root;
+  struct olsrd_avl_node *first;
+  struct olsrd_avl_node *last;
   unsigned int count;
-  avl_tree_comp comp;
+  olsrd_avl_tree_comp comp;
 };
 
-#define AVL_DUP    1
-#define AVL_DUP_NO 0
+#define OLSRD_AVL_DUP    1
+#define OLSRD_AVL_DUP_NO 0
 
-void avl_init(struct avl_tree *, avl_tree_comp);
-struct avl_node *avl_find(struct avl_tree *, const void *);
-int avl_insert(struct avl_tree *, struct avl_node *, int);
-void avl_delete(struct avl_tree *, struct avl_node *);
+void olsrd_avl_init(struct olsrd_avl_tree *, olsrd_avl_tree_comp);
+struct olsrd_avl_node *olsrd_avl_find(struct olsrd_avl_tree *, const void *);
+int olsrd_avl_insert(struct olsrd_avl_tree *, struct olsrd_avl_node *, int);
+void olsrd_avl_delete(struct olsrd_avl_tree *, struct olsrd_avl_node *);
 
-static INLINE struct avl_node *
-avl_walk_first(struct avl_tree *tree)
+static INLINE struct olsrd_avl_node *
+olsrd_avl_walk_first(struct olsrd_avl_tree *tree)
 {
   if (!tree) {
     return NULL;
@@ -88,8 +88,8 @@ avl_walk_first(struct avl_tree *tree)
 
   return tree->first;
 }
-static INLINE struct avl_node *
-avl_walk_last(struct avl_tree *tree)
+static INLINE struct olsrd_avl_node *
+olsrd_avl_walk_last(struct olsrd_avl_tree *tree)
 {
   if (!tree) {
     return NULL;
@@ -97,8 +97,8 @@ avl_walk_last(struct avl_tree *tree)
 
   return tree->last;
 }
-static INLINE struct avl_node *
-avl_walk_next(struct avl_node *node)
+static INLINE struct olsrd_avl_node *
+olsrd_avl_walk_next(struct olsrd_avl_node *node)
 {
   if (!node) {
     return NULL;
@@ -106,8 +106,8 @@ avl_walk_next(struct avl_node *node)
 
   return node->next;
 }
-static INLINE struct avl_node *
-avl_walk_prev(struct avl_node *node)
+static INLINE struct olsrd_avl_node *
+olsrd_avl_walk_prev(struct olsrd_avl_node *node)
 {
   if (!node) {
     return NULL;
@@ -117,8 +117,8 @@ avl_walk_prev(struct avl_node *node)
 }
 
 /* and const versions*/
-static INLINE const struct avl_node *
-avl_walk_first_c(const struct avl_tree *tree)
+static INLINE const struct olsrd_avl_node *
+olsrd_avl_walk_first_c(const struct olsrd_avl_tree *tree)
 {
   if (!tree) {
     return NULL;
@@ -126,8 +126,8 @@ avl_walk_first_c(const struct avl_tree *tree)
 
   return tree->first;
 }
-static INLINE const struct avl_node *
-avl_walk_last_c(const struct avl_tree *tree)
+static INLINE const struct olsrd_avl_node *
+olsrd_avl_walk_last_c(const struct olsrd_avl_tree *tree)
 {
   if (!tree) {
     return NULL;
@@ -135,8 +135,8 @@ avl_walk_last_c(const struct avl_tree *tree)
 
   return tree->last;
 }
-static INLINE const struct avl_node *
-avl_walk_next_c(const struct avl_node *node)
+static INLINE const struct olsrd_avl_node *
+olsrd_avl_walk_next_c(const struct olsrd_avl_node *node)
 {
   if (!node) {
     return NULL;
@@ -144,8 +144,8 @@ avl_walk_next_c(const struct avl_node *node)
 
   return node->next;
 }
-static INLINE const struct avl_node *
-avl_walk_prev_c(const struct avl_node *node)
+static INLINE const struct olsrd_avl_node *
+olsrd_avl_walk_prev_c(const struct olsrd_avl_node *node)
 {
   if (!node) {
     return NULL;
@@ -154,26 +154,26 @@ avl_walk_prev_c(const struct avl_node *node)
   return node->prev;
 }
 
-extern avl_tree_comp avl_comp_default;
-extern avl_tree_comp avl_comp_prefix_default;
-extern int avl_comp_ipv4(const void *, const void *);
-extern int avl_comp_ipv6(const void *, const void *);
-extern int avl_comp_mac(const void *, const void *);
+extern olsrd_avl_tree_comp olsrd_avl_comp_default;
+extern olsrd_avl_tree_comp olsrd_avl_comp_prefix_default;
+extern int olsrd_avl_comp_ipv4(const void *, const void *);
+extern int olsrd_avl_comp_ipv6(const void *, const void *);
+extern int olsrd_avl_comp_mac(const void *, const void *);
 
 /*
  * Macro to define an INLINE function to map from a list_node offset back to the
  * base of the datastructure. That way you save an extra data pointer.
  */
-#define AVLNODE2STRUCT(funcname, structname, avlnodename) \
-static INLINE structname * funcname (struct avl_node *ptr)\
+#define OLSRD_AVLNODE2STRUCT(funcname, structname, olsrd_avlnodename) \
+static INLINE structname * funcname (struct olsrd_avl_node *ptr)\
 {\
   return( \
     ptr ? \
-      (structname *) (((size_t) ptr) - offsetof(structname, avlnodename)) : \
+      (structname *) (((size_t) ptr) - offsetof(structname, olsrd_avlnodename)) : \
       NULL); \
 }
 
-#endif /* _AVL_H */
+#endif /* _OLSRD_AVL_H */
 
 /*
  * Local Variables:

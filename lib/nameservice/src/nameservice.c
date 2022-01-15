@@ -1621,13 +1621,13 @@ void
 lookup_defhna_latlon(union olsr_ip_addr *ip)
 {
   struct rt_entry *rt;
-  struct avl_node *rt_tree_node;
+  struct olsrd_avl_node *rt_tree_node;
   struct olsr_ip_prefix prefix;
 
   memset(ip, 0, sizeof(*ip));
   memset(&prefix, 0, sizeof(prefix));
 
-  if (NULL != (rt_tree_node = avl_find(&routingtree, &prefix))) {
+  if (NULL != (rt_tree_node = olsrd_avl_find(&routingtree, &prefix))) {
     rt = rt_tree2rt(rt_tree_node);
     *ip = rt->rt_best->rtp_nexthop.gateway;
   }

@@ -51,7 +51,7 @@
 #include "net_os.h"
 #include "mpr_selector_set.h"
 #include "olsr_random.h"
-#include "common/avl.h"
+#include "common/olsrd_avl.h"
 
 #include <sys/times.h>
 
@@ -89,29 +89,29 @@ static void poll_sockets(void);
 static uint32_t calc_jitter(unsigned int rel_time, uint8_t jitter_pct, unsigned int random_val);
 static void olsr_cleanup_timer(struct timer_entry *timer);
 
-struct avl_tree timer_cleanup_tree;
+struct olsrd_avl_tree timer_cleanup_tree;
 
 struct timer_cleanup_entry {
-  struct avl_node avl;
+  struct olsrd_avl_node olsrd_avl;
   struct timer_entry * timer;
 };
 
-/* static INLINE struct timer_cleanup_entry * node2timercleanup(struct avl_node *ptr) */
-AVLNODE2STRUCT(node2timercleanup, struct timer_cleanup_entry, avl);
+/* static INLINE struct timer_cleanup_entry * node2timercleanup(struct olsrd_avl_node *ptr) */
+OLSRD_AVLNODE2STRUCT(node2timercleanup, struct timer_cleanup_entry, olsrd_avl);
 
 /**
  * Loop over all timer cleanup entries and put the iterated entry in timer
  */
 #define OLSR_FOR_ALL_TIMERS_CLEANUP(timer) \
 { \
-  struct avl_node *timer_avl_node, *timer_avl_node_next; \
-  for (timer_avl_node = avl_walk_first(&timer_cleanup_tree); \
-  timer_avl_node; timer_avl_node = timer_avl_node_next) { \
-	  timer_avl_node_next = avl_walk_next(timer_avl_node); \
-    timer = node2timercleanup(timer_avl_node);
+  struct olsrd_avl_node *timer_olsrd_avl_node, *timer_olsrd_avl_node_next; \
+  for (timer_olsrd_avl_node = olsrd_avl_walk_first(&timer_cleanup_tree); \
+  timer_olsrd_avl_node; timer_olsrd_avl_node = timer_olsrd_avl_node_next) { \
+	  timer_olsrd_avl_node_next = olsrd_avl_walk_next(timer_olsrd_avl_node); \
+    timer = node2timercleanup(timer_olsrd_avl_node);
 #define OLSR_FOR_ALL_TIMER_CLEANUP_END(timer) }}
 
-static int avl_comp_timer(const void *entry1, const void *entry2) {
+static int olsrd_avl_comp_timer(const void *entry1, const void *entry2) {
   if (entry1 < entry2) {
     return -1;
   }
@@ -638,7 +638,7 @@ olsr_init_timers(void)
   last_tv = first_tv;
   now_times = olsr_times();
 
-  avl_init(&timer_cleanup_tree, avl_comp_timer);
+  olsrd_avl_init(&timer_cleanup_tree, olsrd_avl_comp_timer);
 
   for (idx = 0; idx < TIMER_WHEEL_SLOTS; idx++) {
     list_head_init(&timer_wheel[idx]);
@@ -760,7 +760,7 @@ static void walk_timers_cleanup(void) {
 
   OLSR_FOR_ALL_TIMERS_CLEANUP(timer) {
     olsr_cleanup_timer(timer->timer);
-    avl_delete(&timer_cleanup_tree, &timer->avl);
+    olsrd_avl_delete(&timer_cleanup_tree, &timer->olsrd_avl);
     free(timer);
   } OLSR_FOR_ALL_TIMER_CLEANUP_END(slot)
 }
@@ -969,9 +969,9 @@ olsr_stop_timer(struct timer_entry *timer)
 
   {
     struct timer_cleanup_entry * node = olsr_malloc(sizeof(struct timer_cleanup_entry), "timer cleanup entry");
-    node->avl.key = timer;
+    node->olsrd_avl.key = timer;
     node->timer = timer;
-    if (avl_insert(&timer_cleanup_tree, &node->avl, AVL_DUP_NO) == -1) {
+    if (olsrd_avl_insert(&timer_cleanup_tree, &node->olsrd_avl, OLSRD_AVL_DUP_NO) == -1) {
       /* duplicate */
       free(node);
     }

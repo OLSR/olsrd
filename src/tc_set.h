@@ -48,7 +48,7 @@
 
 #include "defs.h"
 #include "packet.h"
-#include "common/avl.h"
+#include "common/olsrd_avl.h"
 #include "common/list.h"
 #include "scheduler.h"
 
@@ -60,7 +60,7 @@
  */
 
 struct tc_edge_entry {
-  struct avl_node edge_node;           /* edge_tree node in tc_entry */
+  struct olsrd_avl_node edge_node;           /* edge_tree node in tc_entry */
   union olsr_ip_addr T_dest_addr;      /* edge_node key */
   struct tc_edge_entry *edge_inv;      /* shortcut, used during SPF calculation */
   struct tc_entry *tc;                 /* backpointer to owning tc entry */
@@ -69,16 +69,16 @@ struct tc_edge_entry {
   uint32_t linkquality[0];
 };
 
-AVLNODE2STRUCT(edge_tree2tc_edge, struct tc_edge_entry, edge_node);
+OLSRD_AVLNODE2STRUCT(edge_tree2tc_edge, struct tc_edge_entry, edge_node);
 
 struct tc_entry {
-  struct avl_node vertex_node;         /* node keyed by ip address */
+  struct olsrd_avl_node vertex_node;         /* node keyed by ip address */
   union olsr_ip_addr addr;             /* vertex_node key */
-  struct avl_node cand_tree_node;      /* SPF candidate heap, node keyed by path_etx */
+  struct olsrd_avl_node cand_tree_node;      /* SPF candidate heap, node keyed by path_etx */
   olsr_linkcost path_cost;             /* SPF calculated distance, cand_tree_node key */
   struct list_node path_list_node;     /* SPF result list */
-  struct avl_tree edge_tree;           /* subtree for edges */
-  struct avl_tree prefix_tree;         /* subtree for prefixes */
+  struct olsrd_avl_tree edge_tree;           /* subtree for edges */
+  struct olsrd_avl_tree prefix_tree;         /* subtree for prefixes */
   struct link_entry *next_hop;         /* SPF calculated link to the 1st hop neighbor */
   struct timer_entry *edge_gc_timer;   /* used for edge garbage collection */
   struct timer_entry *validity_timer;  /* tc validity time */
@@ -102,8 +102,8 @@ struct tc_entry {
 
 #define OLSR_TC_VTIME_JITTER 5          /* percent */
 
-AVLNODE2STRUCT(vertex_tree2tc, struct tc_entry, vertex_node);
-AVLNODE2STRUCT(cand_tree2tc, struct tc_entry, cand_tree_node);
+OLSRD_AVLNODE2STRUCT(vertex_tree2tc, struct tc_entry, vertex_node);
+OLSRD_AVLNODE2STRUCT(cand_tree2tc, struct tc_entry, cand_tree_node);
 LISTNODE2STRUCT(pathlist2tc, struct tc_entry, path_list_node);
 
 /*
@@ -116,32 +116,32 @@ LISTNODE2STRUCT(pathlist2tc, struct tc_entry, path_list_node);
  */
 #define OLSR_FOR_ALL_TC_ENTRIES(tc) \
 { \
-  struct avl_node *tc_tree_node, *next_tc_tree_node; \
-  for (tc_tree_node = avl_walk_first(&tc_tree); \
+  struct olsrd_avl_node *tc_tree_node, *next_tc_tree_node; \
+  for (tc_tree_node = olsrd_avl_walk_first(&tc_tree); \
     tc_tree_node; tc_tree_node = next_tc_tree_node) { \
-    next_tc_tree_node = avl_walk_next(tc_tree_node); \
+    next_tc_tree_node = olsrd_avl_walk_next(tc_tree_node); \
     tc = vertex_tree2tc(tc_tree_node);
 #define OLSR_FOR_ALL_TC_ENTRIES_END(tc) }}
 
 #define OLSR_FOR_ALL_TC_EDGE_ENTRIES(tc, tc_edge) \
 { \
-  struct avl_node *tc_edge_node, *next_tc_edge_node; \
-  for (tc_edge_node = avl_walk_first(&tc->edge_tree); \
+  struct olsrd_avl_node *tc_edge_node, *next_tc_edge_node; \
+  for (tc_edge_node = olsrd_avl_walk_first(&tc->edge_tree); \
     tc_edge_node; tc_edge_node = next_tc_edge_node) { \
-    next_tc_edge_node = avl_walk_next(tc_edge_node); \
+    next_tc_edge_node = olsrd_avl_walk_next(tc_edge_node); \
     tc_edge = edge_tree2tc_edge(tc_edge_node);
 #define OLSR_FOR_ALL_TC_EDGE_ENTRIES_END(tc, tc_edge) }}
 
 #define OLSR_FOR_ALL_PREFIX_ENTRIES(tc, rtp) \
 { \
-  struct avl_node *rtp_node, *next_rtp_node; \
-  for (rtp_node = avl_walk_first(&tc->prefix_tree); \
+  struct olsrd_avl_node *rtp_node, *next_rtp_node; \
+  for (rtp_node = olsrd_avl_walk_first(&tc->prefix_tree); \
     rtp_node; rtp_node = next_rtp_node) { \
-    next_rtp_node = avl_walk_next(rtp_node); \
+    next_rtp_node = olsrd_avl_walk_next(rtp_node); \
     rtp = rtp_prefix_tree2rtp(rtp_node);
 #define OLSR_FOR_ALL_PREFIX_ENTRIES_END(tc, rtp) }}
 
-extern struct avl_tree tc_tree;
+extern struct olsrd_avl_tree tc_tree;
 extern struct tc_entry *tc_myself;
 
 void olsr_init_tc(void);

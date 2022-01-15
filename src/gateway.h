@@ -46,7 +46,7 @@
 #ifndef GATEWAY_H_
 #define GATEWAY_H_
 
-#include "common/avl.h"
+#include "common/olsrd_avl.h"
 #include "common/list.h"
 #include "defs.h"
 #include "olsr.h"
@@ -96,7 +96,7 @@ enum gateway_hna_fields {
 
 /** a gateway entry */
 struct gateway_entry {
-    struct avl_node node;
+    struct olsrd_avl_node node;
     union olsr_ip_addr originator;
     struct olsr_ip_prefix external_prefix;
     uint32_t uplink;
@@ -129,27 +129,27 @@ struct interfaceName {
 #endif /* __linux__ */
 
 /**
- * static INLINE struct gateway_entry * node2gateway (struct avl_node *ptr)
+ * static INLINE struct gateway_entry * node2gateway (struct olsrd_avl_node *ptr)
  *
  * Converts a node into a gateway entry
  */
-AVLNODE2STRUCT(node2gateway, struct gateway_entry, node);
+OLSRD_AVLNODE2STRUCT(node2gateway, struct gateway_entry, node);
 
 /**
  * Loop over all gateway entries and put the iterated gateway entry in gw
  */
 #define OLSR_FOR_ALL_GATEWAY_ENTRIES(gw) \
 { \
-  struct avl_node *gw_node, *next_gw_node; \
-  for (gw_node = avl_walk_first(&gateway_tree); \
+  struct olsrd_avl_node *gw_node, *next_gw_node; \
+  for (gw_node = olsrd_avl_walk_first(&gateway_tree); \
     gw_node; gw_node = next_gw_node) { \
-    next_gw_node = avl_walk_next(gw_node); \
+    next_gw_node = olsrd_avl_walk_next(gw_node); \
     gw = node2gateway(gw_node); \
     if (gw) {
 #define OLSR_FOR_ALL_GATEWAY_ENTRIES_END(gw) }}}
 
 /** the gateway tree */
-extern struct avl_tree gateway_tree;
+extern struct olsrd_avl_tree gateway_tree;
 
 /** the list IPv4 gateways */
 extern struct gw_list gw_list_ipv4;
