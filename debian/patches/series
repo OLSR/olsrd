@@ -1,4 +1,4 @@
 111-build-mips-and-armhf.patch
 120-deactivate-gtk.patch
-290-hardcode-etc-olsrd-olsrd-conf.patch
+130-debian-prefix-libdir.patch
 310-hardening-fixes.patch

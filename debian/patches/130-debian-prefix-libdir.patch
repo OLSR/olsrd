@@ -1,0 +1,13 @@
+--- Makefile.linux	2022-04-10 06:41:04.000000000 +0200
++++ Makefile.linux.orig	2022-04-10 06:39:49.000000000 +0200
+@@ -49,8 +49,8 @@
+ LDCONFIG ?= /sbin/ldconfig
+ 
+ DESTDIR ?=
+-prefix ?= /usr
+-libdir ?= $(prefix)/lib/olsrd
++prefix ?= /usr/local
++libdir ?= $(prefix)/lib
+ datarootdir ?= $(prefix)/share
+ mandir ?= $(datarootdir)/man
+ sbindir ?= $(prefix)/sbin
