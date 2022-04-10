@@ -1,0 +1,26 @@
+---
+ Makefile     |    2 ++
+ Makefile.inc |    1 +
+ 2 files changed, 3 insertions(+)
+
+--- olsrd-0.6.6.1.orig/Makefile
++++ olsrd-0.6.6.1/Makefile
+@@ -54,6 +54,8 @@ LDFLAGS +=	-Wl,--out-implib=libolsrd.a
+ LDFLAGS +=	-Wl,--export-all-symbols
+ endif
+ 
++LDFLAGS += -Wl,-z,now -pie
++
+ SWITCHDIR =	src/olsr_switch
+ CFGDIR =	src/cfgparser
+ include $(CFGDIR)/local.mk
+--- olsrd-0.6.6.1.orig/Makefile.inc
++++ olsrd-0.6.6.1/Makefile.inc
+@@ -165,6 +165,7 @@ endif
+ LDFLAGS +=	-shared
+ LDFLAGS +=	-Wl,-soname,$(PLUGIN_SONAME)
+ LDFLAGS +=	-Wl,--version-script=version-script.txt 
++LDFLAGS +=	-Wl,-z,now
+ else
+ # c and ld flags for main
+ ifeq ($(OS),win32)

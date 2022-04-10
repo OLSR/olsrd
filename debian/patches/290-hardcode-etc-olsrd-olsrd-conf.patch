@@ -1,0 +1,179 @@
+From: Hans-Christoph Steiner <hans@eds.org>
+Description: hard-code /etc/olsrd and /usr/lib/olsrd for Debian-style
+ This patch sets up /etc/olsrd as the config dir and /usr/lib/olsrd as the dir
+ for olsrd plugins, following Debian convention.
+
+---
+ Makefile.inc                       |    4 ++--
+ lib/arprefresh/README_ARPREFRESH   |    2 +-
+ lib/bmf/README_BMF                 |   10 +++++-----
+ lib/mini/README_MINI               |    2 +-
+ lib/nameservice/README_NAMESERVICE |    2 +-
+ lib/pgraph/README_PGRAPH           |    4 ++--
+ lib/quagga/README_QUAGGA           |    2 +-
+ lib/watchdog/README_WATCHDOG       |    2 +-
+ make/Makefile.linux                |    4 ++--
+ src/main.c                         |    2 +-
+ 10 files changed, 17 insertions(+), 17 deletions(-)
+
+--- olsrd-0.6.6.1.orig/Makefile.inc
++++ olsrd-0.6.6.1/Makefile.inc
+@@ -57,10 +57,10 @@ TAGCMD ?=	etags
+ 
+ # target directories and names
+ DESTDIR  ?=
+-ETCDIR   ?= $(DESTDIR)/etc
++ETCDIR   ?= $(DESTDIR)/etc/olsrd
+ USRDIR   ?= $(DESTDIR)/usr
+ INCLUDEDIR ?= $(DESTDIR)/usr/include
+-LIBDIR   ?= $(USRDIR)/lib
++LIBDIR   ?= $(USRDIR)/lib/olsrd
+ SBINDIR  ?= $(USRDIR)/sbin
+ SHAREDIR ?= $(USRDIR)/share
+ DOCDIR   ?= $(SHAREDIR)/doc
+--- olsrd-0.6.6.1.orig/lib/arprefresh/README_ARPREFRESH
++++ olsrd-0.6.6.1/lib/arprefresh/README_ARPREFRESH
+@@ -21,7 +21,7 @@ None.
+ SAMPLE CONFIG
+ ---------------------------------------------------------------------
+ 
+-add in /etc/olsrd.conf:
++add in /etc/olsrd/olsrd.conf:
+ 
+ LoadPlugin "arprefresh.so.0.1"
+ {
+--- olsrd-0.6.6.1.orig/lib/bmf/README_BMF
++++ olsrd-0.6.6.1/lib/bmf/README_BMF
+@@ -44,7 +44,7 @@ Set permissions, e.g.:
+ 
+   chmod 0700 /dev/net/tun
+ 
+-To configure BMF in OLSR, you must edit the file /etc/olsrd.conf
++To configure BMF in OLSR, you must edit the file /etc/olsrd/olsrd.conf
+ to load the BMF plugin. For example, add the following lines:
+ 
+   LoadPlugin "olsrd_bmf.so.1.7.0"
+@@ -184,7 +184,7 @@ the forwarding towards non-OLSR enabled
+ -------------------------
+ 
+ All configuration of BMF is done via the "LoadPlugin" section in
+-the /etc/olsrd.conf file.
++the /etc/olsrd/olsrd.conf file.
+ 
+ The following gives an overview of all plugin parameters that can be
+ configured. Unless otherwise stated, settings may differ for each node in the
+@@ -354,7 +354,7 @@ non-OLSR interfaces.
+ If you have network interfaces on which OLSR is *not* running, but you *do*
+ want to forward multicast and local-broadcast IP packets, specify these
+ interfaces one by one as "NonOlsrIf" parameters in the BMF plugin section
+-of /etc/olsrd.conf. For example:
++of /etc/olsrd/olsrd.conf. For example:
+ 
+   LoadPlugin "olsrd_bmf.so.1.7.0"
+   {
+@@ -374,7 +374,7 @@ as an OLSR-enabled interface.
+ In a typical interworking configuration there is a network of OLSR hosts
+ in which one host acts as a gateway to a fixed infrastructure network.
+ Usually that host will be advertising a default route via the HNA
+-mechanism, e.g. by adding the following lines to its /etc/olsrd.conf
++mechanism, e.g. by adding the following lines to its /etc/olsrd/olsrd.conf
+ file:
+ 
+   Hna4
+@@ -411,7 +411,7 @@ add the following line /etc/mrouted.conf
+ 
+ Finally, mrouted does not accept interfaces with prefix length 32.
+ Therefore, override the default IP address and prefix length of
+-the BMF network interface, by editing the /etc/olsrd.conf file.
++the BMF network interface, by editing the /etc/olsrd/olsrd.conf file.
+ For example:
+ 
+   LoadPlugin "olsrd_bmf.so.1.7.0"
+--- olsrd-0.6.6.1.orig/lib/mini/README_MINI
++++ olsrd-0.6.6.1/lib/mini/README_MINI
+@@ -24,7 +24,7 @@ PlParam "test" "anything"
+ SAMPLE CONFIG
+ ---------------------------------------------------------------------
+ 
+-add in /etc/olsrd.conf:
++add in /etc/olsrd/olsrd.conf:
+ 
+ LoadPlugin "olsrd_mini.so.0.1"
+ {
+--- olsrd-0.6.6.1.orig/lib/nameservice/README_NAMESERVICE
++++ olsrd-0.6.6.1/lib/nameservice/README_NAMESERVICE
+@@ -142,7 +142,7 @@ PlParam "macs-change-script" "/path/to/s
+ SAMPLE CONFIG
+ ---------------------------------------------------------------------
+ 
+-add in /etc/olsrd.conf:
++add in /etc/olsrd/olsrd.conf:
+ 
+ LoadPlugin "olsrd_nameservice.so.0.2"
+ {
+--- olsrd-0.6.6.1.orig/lib/pgraph/README_PGRAPH
++++ olsrd-0.6.6.1/lib/pgraph/README_PGRAPH
+@@ -39,7 +39,7 @@ Usage:
+            run "make" and "make install"
+ 	   This will create the "olsrd_pgraph.so.1.1" file and install it. 
+ 
+-	3) Modify the "/etc/olsrd.conf" file of the system you wish to
++	3) Modify the "/etc/olsrd/olsrd.conf" file of the system you wish to
+ 	   monitor from to load the plugin. 
+ 	   Add the line: "LoadPlugin "olsrd_pgraph.so.1.1" {}"
+ 
+@@ -51,7 +51,7 @@ Usage:
+            # By default only localhost will be able to connect to the IPC
+ 	   # system of the olsrd process so if you are not going to be 
+ 	   # running pgraph locally, modify the "Host" variable of the 
+-	   # "IpcConnect" structure in the "/etc/olsrd.conf" file to 
++	   # "IpcConnect" structure in the "/etc/olsrd/olsrd.conf" file to
+ 	   # reflect the IP address of the host you will be connecting from. 
+ 
+ 	5) Start olsrd and make sure that the plugin has loaded correctly.
+--- olsrd-0.6.6.1.orig/lib/quagga/README_QUAGGA
++++ olsrd-0.6.6.1/lib/quagga/README_QUAGGA
+@@ -58,7 +58,7 @@ PlParam "Version" "<version>"
+ SAMPLE CONFIG
+ ---------------------------------------------------------------------
+ 
+-add in /usr/local/etc/olsrd.conf:
++add in /etc/olsrd/olsrd.conf:
+ 
+ LoadPlugin "olsrd_quagga.so.0.2.2"
+ {
+--- olsrd-0.6.6.1.orig/lib/watchdog/README_WATCHDOG
++++ olsrd-0.6.6.1/lib/watchdog/README_WATCHDOG
+@@ -21,7 +21,7 @@ PlParam "interval" "5"
+ SAMPLE CONFIG
+ ---------------------------------------------------------------------
+ 
+-add in /etc/olsrd.conf:
++add in /etc/olsrd/olsrd.conf:
+ 
+ LoadPlugin "olsrd_watchdog.so.0.1"
+ {
+--- olsrd-0.6.6.1.orig/make/Makefile.linux
++++ olsrd-0.6.6.1/make/Makefile.linux
+@@ -5,8 +5,8 @@
+ ARCH := $(shell uname -m)
+ 
+ DESTDIR ?=
+-prefix ?= /usr/local
+-libdir ?= $(prefix)/lib
++prefix ?= /usr
++libdir ?= $(prefix)/lib/olsrd
+ datarootdir ?= $(prefix)/share
+ mandir ?= $(datarootdir)/man
+ sbindir ?= $(prefix)/sbin
+--- olsrd-0.6.6.1.orig/src/main.c
++++ olsrd-0.6.6.1/src/main.c
+@@ -394,7 +394,7 @@ int main(int argc, char *argv[]) {
+ 
+   strscpy(conf_file_name + len, "olsrd.conf", sizeof(conf_file_name) - len);
+ #else /* _WIN32 */
+-  strscpy(conf_file_name, OLSRD_GLOBAL_CONF_FILE, sizeof(conf_file_name));
++  strscpy(conf_file_name, "/etc/olsrd/olsrd.conf", sizeof(conf_file_name));
+ #endif /* _WIN32 */
+ 
+   olsr_cnf = olsrd_get_default_cnf();
