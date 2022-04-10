@@ -1,4 +1,4 @@
-olsrd (0.9.8-3 UNRELEASED; urgency=medium
+olsrd (0.9.8-3) UNRELEASED; urgency=medium
 
   * update patch series, improved prefix and libdir patch
 
