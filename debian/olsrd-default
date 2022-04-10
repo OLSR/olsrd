@@ -1,0 +1,48 @@
+# Defaults for olsrd initscript
+# sourced by /etc/init.d/olsrd
+# installed at /etc/default/olsrd by the maintainer scripts
+
+#
+# Uncomment the next line run olsrd automatically at startup
+#
+#START_OLSRD="YES"
+
+#
+# Uncomment the next line to force-configure the wifi interface to be setup
+# for ad-hoc mode using the /usr/sbin/olsrd-adhoc-setup script whenever olsrd
+# is started.
+#
+#SETUP_ADHOC="YES"
+
+#
+# debuglevel from 1 (=quiet) to 9 (=max debug)
+# for running from init.d 0 is recommended
+#
+DEBUGLEVEL=0
+
+#
+# Specify the network interfaces that olsrd will run on, this will most likely
+# be your wifi interface.
+#
+MESH_IF=wlan0
+
+#
+# The wifi channel to setup using olsrd-adhoc-setup
+#
+channel=5
+
+#
+# The SSID for the mesh network to connect to using olsrd-adhoc-setup
+#
+ssid=commotionwireless.net
+
+#
+# The BSSID for the mesh network to connect to using olsrd-adhoc-setup
+#
+bssid=02:ca:ff:ee:ba:be
+
+#
+# "command-line options"
+#
+DAEMON_OPTS="-i $MESH_IF -d $DEBUGLEVEL"
+

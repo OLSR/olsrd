@@ -1,0 +1,15 @@
+---
+ make/Makefile.linux |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- olsrd-0.6.6.1.orig/make/Makefile.linux
++++ olsrd-0.6.6.1/make/Makefile.linux
+@@ -39,7 +39,7 @@ UNINSTALL_LIB =	rm -f $(LIBDIR)/$(PLUGIN
+ ifdef OLSRD_PLUGIN
+ GENERATE_PIC = true
+ endif
+-ifeq ($(filter-out mips mips64 alpha x86_64 parisc64 ia64, $(ARCH)),)
++ifeq ($(filter-out armv7l mips mips64 alpha x86_64 parisc64 ia64, $(ARCH)),)
+ GENERATE_PIC = true
+ endif
+ 

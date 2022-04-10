@@ -1,0 +1,59 @@
+Source: olsrd
+Section: net
+Priority: optional
+Maintainer: Roland Stigge <stigge@antcom.de>
+Uploaders: Hans-Christoph Steiner <hans@eds.org>
+Build-Depends: debhelper (>= 9),
+               bison,
+               flex,
+               pkg-config,
+               libgps-dev,
+               liblua50-dev
+Standards-Version: 3.9.5
+Homepage: http://olsr.org/
+Vcs-Git: https://salsa.debian.org/debian/olsrd.git
+Vcs-Browser: https://salsa.debian.org/debian/olsrd
+
+Package: olsrd
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: olsrd-plugins
+Description: optimized link-state routing daemon (unik-olsrd)
+ unik-olsrd is an implementation of the Optimized Link State Routing protocol
+ for Mobile Ad-Hoc networks(MANET). The protocol is described in RFC3626. It
+ is designed to be run as a standalone server process.
+ .
+ OLSR operates as a table driven, proactive protocol, i.e., it exchanges
+ topology information with other nodes of the network regularly. It is
+ developed to work independently from other protocols. Likewise, OLSR makes no
+ assumptions about the underlying link-layer.
+
+Package: olsrd-plugins
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, olsrd (= ${binary:Version})
+Description: various plugins to enhance olsrd
+ olsrd is an implementation of the Optimized Link State Routing protocol
+ for Mobile Ad-Hoc networks(MANET)
+ .
+ The following plugins are available:
+ .
+  * httpinfo      - tiny webserver for information purposes
+  * dyn_gw        - dynamically announce uplinks
+  * dot_draw      - generates output (over a TCP socket) in the dot format
+  * secure        - secure OLSR routing with a shared key
+  * nameservice   - announce hostnames and dns servers
+  * bmf           - basic multicast forwarding
+  * quagga        - import external routes from quagga
+  * txtinfo       - display information about the OSLR node
+ .
+ The following plugins are also included, even though experimental and demo
+ plugins:
+ .
+  * pgraph        - performance graph
+  * watchdog      - detection of olsrd freeze
+  * tas           - tiny application server
+  * mini          - minimal example plugin (demo)
+  * dyn_gw_plain  - dyn_gw without ping/libthread
+  * arprefresh    - optimize kernel arp cache from olsr UDP sniffing
+  * mdnsp         - multicast DNS via OLSR mesh network
+  * p2pd          - distribute P2P Discovery messages
