@@ -60,13 +60,22 @@ struct GpsdConnectionState {
     struct devconfig_t dev[MAXUSERDEVS];
 };
 
-/* describe a data source */
+/**
+ * describe a data source
+ *
+ * Starting with gpsd 3.25, this is now provided in gps.h, but we have no way
+ * to compare gpsd version as it is not provided in gps.h; all we can compare
+ * against is the API version. struct fixsource_t was moved as part  of bumping
+ * to API 14, so we compare agasint that
+ */
+#if GPSD_API_MAJOR_VERSION < 14
 struct fixsource_t {
     char spec[PATH_MAX]; /* working space, will be modified */
     char *server; /* pointer into spec field */
     char *port; /* pointer into spec field */
     char *device; /* pointer into spec field */
 };
+#endif
 
 /**
  * The gpsd daemon spec
