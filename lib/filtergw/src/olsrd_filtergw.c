@@ -54,6 +54,7 @@
 #include "log.h"
 #include "routing_table.h"
 #include "olsr_cfg.h"
+#include "parser.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -79,6 +80,10 @@ struct filter_group {
 };
 
 static struct filter_group * filter_groups = NULL;
+
+// Delcaring function prototype here, fixes build error with clang-16
+// Refer: https://bugs.gentoo.org/898090
+int should_filter(union olsr_ip_addr * originator);
 
 /* -------------------------------------------------------------------------
  * Function   : add_to_originator_list
@@ -121,7 +126,7 @@ set_plugin_filter(const char *value, void *data __attribute__ ((unused)), set_pl
         olsr_exit("FILTERGW: Out of memory", EXIT_FAILURE);
       }
       filter_groups = new;
-      new->next =  filter_groups;
+      new->next = (struct hna_group *) filter_groups;
   }
 
   filter_groups->originator_list = add_to_originator_list(&addr, filter_groups->originator_list);
