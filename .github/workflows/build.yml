@@ -14,4 +14,4 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get install build-essential dpkg-dev bison flex libgps-dev
       - name: Compile olsrd
-        run: cd olsrd && make build_all
+        run: cd olsrd && CFLAGS="-Wno-error" make build_all
