@@ -1,0 +1,2 @@
+version=3
+http://www.olsr.org/releases/0.9/ olsrd-([\d\.]+)\.tar\.gz
