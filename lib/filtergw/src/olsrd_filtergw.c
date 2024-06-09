@@ -77,7 +77,7 @@ struct originator_list {
 
 struct filter_group {
   struct originator_list *originator_list;
-  struct hna_group *next;
+  struct filter_group *next;
 };
 
 static struct filter_group *filter_groups = NULL;
@@ -128,7 +128,7 @@ static int set_plugin_filter(const char *value,
       olsr_exit("FILTERGW: Out of memory", EXIT_FAILURE);
     }
     filter_groups = new;
-    new->next = (struct hna_group *)filter_groups;
+    new->next = filter_groups;
   }
 
   filter_groups->originator_list =
