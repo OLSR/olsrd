@@ -80,11 +80,24 @@ struct filter_group {
   struct filter_group *next;
 };
 
+struct int_name_list {
+  char *int_name;
+  struct int_name_list *next;
+};
+
+struct filter_int_name_group {
+  struct int_name_list *int_name_list;
+  struct hna_group *next;
+};
+
 static struct filter_group *filter_groups = NULL;
+static struct filter_int_name_group *filter_int_name_groups = NULL;
 
 // Delcaring function prototype here, fixes build error with clang-16
 // Refer: https://bugs.gentoo.org/898090
 int should_filter(union olsr_ip_addr *originator);
+
+int check_interface(struct interface_olsr *in_if);
 
 /* -------------------------------------------------------------------------
  * Function   : add_to_originator_list
@@ -105,6 +118,18 @@ add_to_originator_list(union olsr_ip_addr *originator_address,
   }
   memcpy(&new->originator, originator_address, olsr_cnf->ipsize);
   new->next = the_originator_list;
+  return new;
+}
+
+static struct int_name_list *
+add_to_int_name_list(const char *int_name,
+                     struct int_name_list *the_int_name_list) {
+  struct int_name_list *new = calloc(1, sizeof(struct int_name_list));
+  if (!new) {
+    olsr_exit("FILTERGW: Out of memory", EXIT_FAILURE);
+  }
+  new->int_name = strdup(int_name);
+  new->next = the_int_name_list;
   return new;
 }
 
@@ -137,6 +162,25 @@ static int set_plugin_filter(const char *value,
   return 0;
 }
 
+static int parse_int_filter(const char *value,
+                            void *data __attribute__((unused)),
+                            set_plugin_parameter_addon addon
+                            __attribute__((unused))) {
+  if (filter_int_name_groups == NULL) {
+    struct filter_group *new = calloc(1, sizeof(struct filter_int_name_group));
+    if (new == NULL) {
+      olsr_exit("FILTERGW: Out of memory", EXIT_FAILURE);
+    }
+    filter_groups = new;
+    new->next = filter_groups;
+  }
+
+  filter_int_name_groups->int_name_list =
+      add_to_int_name_list(value, filter_int_name_groups->int_name_list);
+
+  return 0;
+}
+
 /* -------------------------------------------------------------------------
  * Function   : olsrd_filtergw_parser
  * Description: Function to be passed to the parser engine. This function
@@ -165,6 +209,8 @@ bool olsrd_filtergw_parser(union olsr_message *m,
 #ifdef DEBUG
   OLSR_PRINTF(5, "Processing HNA\n");
 #endif
+  if (!check_interface(in_if))
+    return true;
 
   /* Check if everyting is ok */
   if (!m) {
@@ -247,6 +293,9 @@ static const struct olsrd_plugin_parameters plugin_parameters[] = {
     {.name = "originator",
      .set_plugin_parameter = &set_plugin_filter,
      .data = NULL},
+    {.name = "interface",
+     .set_plugin_parameter = &parse_int_filter,
+     .data = NULL},
     {.name = "allowlist",
      .set_plugin_parameter = &set_plugin_int,
      .data = &is_allowlist},
@@ -304,4 +353,18 @@ int should_filter(union olsr_ip_addr *originator) {
     }
   }
   return is_allowlist ? !found : found;
+}
+
+int check_interface(struct interface_olsr *in_if) {
+  if (filter_int_name_groups == NULL) {
+    /* if no interface is given, apply on all interfaces */
+    return 1;
+  }
+
+  struct int_name_list *list = filter_int_name_groups->int_name_list;
+  for (list = filter_int_name_groups->int_name_list; list; list = list->next) {
+    if (strcmp(list->int_name, in_if->int_name) == 0)
+      return 1;
+  }
+  return 0;
 }
