@@ -203,7 +203,9 @@ ifeq ($(VERBOSE),0)
 	@echo "[JavaH] $<"
 endif
 	$(MAKECMDPREFIX)rm -f "$@"
-	$(MAKECMDPREFIX)javah -jni -classpath "$(BUILD_DIR_JNI)" -o "$@" "$(JAVA_PKG).PositionUpdate"
+	$(MAKECMDPREFIX)javac -h $(SRC_DIR_C) -classpath "$(BUILD_DIR_JNI)" $(JAVASRC)/$(JAVA_PKG_DIR)/PositionUpdate.java \
+																		$(JAVASRC)/$(JAVA_PKG_DIR)/LibraryLoader.java \
+																		$(JAVASRC)/$(JAVA_PKG_DIR)/WireFormatConstants.java
 
 $(BUILD_DIR_JNI)/$(JAVA_PKG_DIR)/PositionUpdate.class: $(JAVASRC)/$(JAVA_PKG_DIR)/PositionUpdate.java \
                                                        $(JAVASRC)/$(JAVA_PKG_DIR)/LibraryLoader.java \
@@ -228,7 +230,9 @@ ifeq ($(VERBOSE),0)
 	@echo "[JavaH] $<"
 endif
 	$(MAKECMDPREFIX)rm -f "$@"
-	$(MAKECMDPREFIX)javah -jni -classpath "$(BUILD_DIR_JNI)" -o "$@" "$(JAVA_PKG).ClusterLeader"
+	$(MAKECMDPREFIX)javac -h $(SRC_DIR_C) -classpath "$(BUILD_DIR_JNI)" $(JAVASRC)/$(JAVA_PKG_DIR)/ClusterLeader.java \
+																		$(JAVASRC)/$(JAVA_PKG_DIR)/LibraryLoader.java \
+																		$(JAVASRC)/$(JAVA_PKG_DIR)/WireFormatConstants.java
 
 $(BUILD_DIR_JNI)/$(JAVA_PKG_DIR)/ClusterLeader.class: $(JAVASRC)/$(JAVA_PKG_DIR)/ClusterLeader.java \
                                                       $(JAVASRC)/$(JAVA_PKG_DIR)/LibraryLoader.java \
@@ -253,7 +257,9 @@ ifeq ($(VERBOSE),0)
 	@echo "[JavaH] $<"
 endif
 	$(MAKECMDPREFIX)rm -f "$@"
-	$(MAKECMDPREFIX)javah -jni -classpath "$(BUILD_DIR_JNI)" -o "$@" "$(JAVA_PKG).UplinkMessage"
+	$(MAKECMDPREFIX)javac -h $(SRC_DIR_C) -classpath "$(BUILD_DIR_JNI)" $(JAVASRC)/$(JAVA_PKG_DIR)/UplinkMessage.java \
+																		$(JAVASRC)/$(JAVA_PKG_DIR)/LibraryLoader.java \
+																		$(JAVASRC)/$(JAVA_PKG_DIR)/WireFormatConstants.java
 
 $(BUILD_DIR_JNI)/$(JAVA_PKG_DIR)/UplinkMessage.class: $(JAVASRC)/$(JAVA_PKG_DIR)/UplinkMessage.java \
                                                       $(JAVASRC)/$(JAVA_PKG_DIR)/LibraryLoader.java \
