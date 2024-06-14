@@ -1,0 +1,48 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/buildflags.mk
+
+export ETCDIR=/etc/olsrd
+export LIBDIR=/lib/olsrd
+export prefix=/usr
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	$(MAKE) DEBUG=0 VERBOSE=1 build_all
+	$(MAKE) -C src/olsr_switch
+
+override_dh_auto_clean:
+	dh_auto_clean
+	$(MAKE) distclean
+
+override_dh_auto_install:
+	$(MAKE) VERBOSE=1 STRIP=: DESTDIR=$(CURDIR)/debian/olsrd \
+		prefix=/usr libdir=/usr/lib/olsrd install
+	$(MAKE) VERBOSE=1 STRIP=: DESTDIR=$(CURDIR)/debian/olsrd-plugins \
+		prefix=/usr libdir=/usr/lib/olsrd libs_install
+	install -d $(CURDIR)/debian/olsrd/usr/sbin/
+	install -p -m0755 files/olsrd-adhoc-setup $(CURDIR)/debian/olsrd/usr/sbin/
+	install -d $(CURDIR)/debian/olsrd/usr/bin/
+	install -p -m0755 olsr_switch $(CURDIR)/debian/olsrd/usr/bin/
+	install -d $(CURDIR)/debian/olsrd/usr/share/man/man8
+	install -p -m0644 files/olsr_switch.8.gz \
+		$(CURDIR)/debian/olsrd/usr/share/man/man8
+	install -d $(CURDIR)/debian/olsrd/usr/share/doc/olsrd/examples
+	install -p -m0644 files/olsrd.conf.[a-z]* \
+		$(CURDIR)/debian/olsrd/usr/share/doc/olsrd/examples
+# provide better default config
+	install -p -m0644 $(CURDIR)/debian/olsrd.conf \
+		$(CURDIR)/debian/olsrd/etc/olsrd/olsrd.conf
+	install -p -m0644 $(CURDIR)/debian/olsrd-default \
+		$(CURDIR)/debian/olsrd/etc/default/olsrd
+
+override_dh_compress:
+	# compress, but don't compress README_NAMESERVICE, for consistency reasons
+	dh_compress -XREADME_NAMESERVICE -XREADME_BMF

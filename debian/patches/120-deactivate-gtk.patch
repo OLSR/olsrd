@@ -1,0 +1,22 @@
+diff --git a/Makefile b/Makefile
+index 4e39dd64..77d2bf84 100644
+--- a/Makefile
++++ b/Makefile
+@@ -117,17 +117,6 @@ clean:
+ 	-rm -fr gui/win32/Main/Release
+ 	-rm -fr gui/win32/Shim/Release
+ 
+-gui:
+-ifeq ($(OS),linux)
+-	$(MAKECMDPREFIX)$(MAKECMD) -C gui/linux-gtk all
+-else
+-	@echo "target gui not supported on $(OS)"
+-	@exit 1
+-endif
+-
+-clean_gui:
+-	$(MAKECMDPREFIX)$(MAKECMD) -C gui/linux-gtk clean
+-
+ distclean: uberclean
+ uberclean:	clean clean_libs clean_gui
+ 	-rm -f $(TAGFILE)
