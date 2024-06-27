@@ -113,6 +113,7 @@ BISON ?=	bison
 FLEX ?=		flex
 LDCONFIG ?=	/sbin/ldconfig
 TAGCMD ?=	etags
+PKG_CONFIG ?=	pkg-config
 
 # target directories and names
 DESTDIR  ?=

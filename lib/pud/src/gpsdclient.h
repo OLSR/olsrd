@@ -61,6 +61,20 @@ struct GpsdConnectionState {
 };
 
 /**
+ * describe a data source
+ *
+ * Starting with gpsd 3.25, this is now provided in gps.h.
+ */
+#if LIBGPS_VERSION_MAJOR <= 3 && LIBGPS_VERSION_MINOR <= 24
+struct fixsource_t {
+    char spec[PATH_MAX]; /* working space, will be modified */
+    char *server; /* pointer into spec field */
+    char *port; /* pointer into spec field */
+    char *device; /* pointer into spec field */
+};
+#endif
+
+/**
  * The gpsd daemon spec
  */
 typedef struct _GpsDaemon {
