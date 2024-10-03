@@ -60,14 +60,6 @@ struct GpsdConnectionState {
     struct devconfig_t dev[MAXUSERDEVS];
 };
 
-/* describe a data source */
-struct fixsource_t {
-    char spec[PATH_MAX]; /* working space, will be modified */
-    char *server; /* pointer into spec field */
-    char *port; /* pointer into spec field */
-    char *device; /* pointer into spec field */
-};
-
 /**
  * The gpsd daemon spec
  */

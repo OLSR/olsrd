@@ -55,6 +55,7 @@ void olsrd_plugin_fini(void);
 
 int olsrd_plugin_interface_version(void);
 
-void olsrd_get_plugin_parameters(const struct olsrd_plugin_parameters **params, int *size);
+void olsrd_get_plugin_parameters(const struct olsrd_plugin_parameters **params,
+                                 int *size);
 
 #endif /* _OLSRD_FILTERGW_H */

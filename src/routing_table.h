@@ -54,7 +54,7 @@
 #include "hna_set.h"
 #include "link_set.h"
 #include "olsr_cookie.h"
-#include "common/avl.h"
+#include "common/olsrd_avl.h"
 #include "common/list.h"
 
 #define NETMASK_HOST 0xffffffff
@@ -81,15 +81,15 @@ struct rt_nexthop {
  */
 struct rt_entry {
   struct olsr_ip_prefix rt_dst;
-  struct avl_node rt_tree_node;
+  struct olsrd_avl_node rt_tree_node;
   struct rt_path *rt_best;             /* shortcut to the best path */
   struct rt_nexthop rt_nexthop;        /* nexthop of FIB route */
   struct rt_metric rt_metric;          /* metric of FIB route */
-  struct avl_tree rt_path_tree;
+  struct olsrd_avl_tree rt_path_tree;
   struct list_node rt_change_node;     /* queue for kernel FIB add/chg/del */
 };
 
-AVLNODE2STRUCT(rt_tree2rt, struct rt_entry, rt_tree_node);
+OLSRD_AVLNODE2STRUCT(rt_tree2rt, struct rt_entry, rt_tree_node);
 LISTNODE2STRUCT(changelist2rt, struct rt_entry, rt_change_node);
 
 /*
@@ -105,16 +105,16 @@ struct rt_path {
   struct tc_entry *rtp_tc;             /* backpointer to owning tc entry */
   struct rt_nexthop rtp_nexthop;
   struct rt_metric rtp_metric;
-  struct avl_node rtp_tree_node;       /* global rtp node */
+  struct olsrd_avl_node rtp_tree_node;       /* global rtp node */
   union olsr_ip_addr rtp_originator;   /* originator of the route */
-  struct avl_node rtp_prefix_tree_node; /* tc entry rtp node */
+  struct olsrd_avl_node rtp_prefix_tree_node; /* tc entry rtp node */
   struct olsr_ip_prefix rtp_dst;       /* the prefix */
   uint32_t rtp_version;                /* for detection of outdated rt_paths */
   uint8_t rtp_origin;                  /* internal, MID or HNA */
 };
 
-AVLNODE2STRUCT(rtp_tree2rtp, struct rt_path, rtp_tree_node);
-AVLNODE2STRUCT(rtp_prefix_tree2rtp, struct rt_path, rtp_prefix_tree_node);
+OLSRD_AVLNODE2STRUCT(rtp_tree2rtp, struct rt_path, rtp_tree_node);
+OLSRD_AVLNODE2STRUCT(rtp_prefix_tree2rtp, struct rt_path, rtp_prefix_tree_node);
 
 /*
  * In olsrd we have three different route types.
@@ -143,10 +143,10 @@ enum olsr_rt_origin {
  */
 #define OLSR_FOR_ALL_RT_ENTRIES(rt) \
 { \
-  struct avl_node *rt_tree_node, *next_rt_tree_node; \
-  for (rt_tree_node = avl_walk_first(&routingtree); \
+  struct olsrd_avl_node *rt_tree_node, *next_rt_tree_node; \
+  for (rt_tree_node = olsrd_avl_walk_first(&routingtree); \
     rt_tree_node; rt_tree_node = next_rt_tree_node) { \
-    next_rt_tree_node = avl_walk_next(rt_tree_node); \
+    next_rt_tree_node = olsrd_avl_walk_next(rt_tree_node); \
     rt = rt_tree2rt(rt_tree_node);
 #define OLSR_FOR_ALL_RT_ENTRIES_END(rt) }}
 
@@ -164,10 +164,10 @@ enum olsr_rt_origin {
  */
 #define OLSR_FOR_ALL_HNA_RT_ENTRIES(rt) \
 { \
-  struct avl_node *rt_tree_node, *next_rt_tree_node; \
-  for (rt_tree_node = avl_walk_first(&routingtree); \
+  struct olsrd_avl_node *rt_tree_node, *next_rt_tree_node; \
+  for (rt_tree_node = olsrd_avl_walk_first(&routingtree); \
     rt_tree_node; rt_tree_node = next_rt_tree_node) { \
-    next_rt_tree_node = avl_walk_next(rt_tree_node); \
+    next_rt_tree_node = olsrd_avl_walk_next(rt_tree_node); \
     rt = rt_tree2rt(rt_tree_node); \
     if (rt->rt_best->rtp_origin != OLSR_RT_ORIGIN_HNA) \
       continue;
@@ -190,7 +190,7 @@ union olsr_kernel_route {
   } v6;
 };
 
-extern struct avl_tree routingtree;
+extern struct olsrd_avl_tree routingtree;
 extern unsigned int routingtree_version;
 extern struct olsr_cookie_info *rt_mem_cookie;
 
@@ -198,8 +198,8 @@ void olsr_init_routing_table(void);
 
 unsigned int olsr_bump_routingtree_version(void);
 
-int avl_comp_ipv4_prefix(const void *, const void *);
-int avl_comp_ipv6_prefix(const void *, const void *);
+int olsrd_avl_comp_ipv4_prefix(const void *, const void *);
+int olsrd_avl_comp_ipv6_prefix(const void *, const void *);
 
 void olsr_rt_best(struct rt_entry *);
 bool olsr_nh_change(const struct rt_nexthop *, const struct rt_nexthop *);
@@ -210,7 +210,7 @@ uint8_t olsr_fib_metric(const struct rt_metric *);
 char *olsr_rt_to_string(const struct rt_entry *);
 char *olsr_rtp_to_string(const struct rt_path *);
 #ifndef NODEBUG
-void olsr_print_routing_table(struct avl_tree *);
+void olsr_print_routing_table(struct olsrd_avl_tree *);
 #else
 #define olsr_print_routing_table(x) do { } while(0)
 #endif

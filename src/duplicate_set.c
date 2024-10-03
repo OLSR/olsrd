@@ -45,7 +45,7 @@
 
 #include "duplicate_set.h"
 #include "ipcalc.h"
-#include "common/avl.h"
+#include "common/olsrd_avl.h"
 #include "olsr.h"
 #include "mid_set.h"
 #include "scheduler.h"
@@ -53,13 +53,13 @@
 
 static void olsr_cleanup_duplicate_entry(void *unused);
 
-struct avl_tree duplicate_set;
+struct olsrd_avl_tree duplicate_set;
 struct timer_entry *duplicate_cleanup_timer;
 
 void
 olsr_init_duplicate_set(void)
 {
-  avl_init(&duplicate_set, olsr_cnf->ip_version == AF_INET ? &avl_comp_ipv4 : &avl_comp_ipv6);
+  olsrd_avl_init(&duplicate_set, olsr_cnf->ip_version == AF_INET ? &olsrd_avl_comp_ipv4 : &olsrd_avl_comp_ipv6);
 
   olsr_set_timer(&duplicate_cleanup_timer, DUPLICATE_CLEANUP_INTERVAL, DUPLICATE_CLEANUP_JITTER, OLSR_TIMER_PERIODIC,
                  &olsr_cleanup_duplicate_entry, NULL, 0);
@@ -68,7 +68,7 @@ olsr_init_duplicate_set(void)
 void olsr_cleanup_duplicates(union olsr_ip_addr *orig) {
   struct dup_entry *entry;
 
-  entry = (struct dup_entry *)avl_find(&duplicate_set, orig);
+  entry = (struct dup_entry *)olsrd_avl_find(&duplicate_set, orig);
   if (entry != NULL) {
     entry->too_low_counter = DUP_MAX_TOO_LOW - 2;
   }
@@ -83,7 +83,7 @@ olsr_create_duplicate_entry(void *ip, uint16_t seqnr)
     memcpy(&entry->ip, ip, olsr_cnf->ip_version == AF_INET ? sizeof(entry->ip.v4) : sizeof(entry->ip.v6));
     entry->seqnr = seqnr;
     entry->too_low_counter = 0;
-    entry->avl.key = &entry->ip;
+    entry->olsrd_avl.key = &entry->ip;
     entry->array = 0;
   }
   return entry;
@@ -96,7 +96,7 @@ olsr_cleanup_duplicate_entry(void __attribute__ ((unused)) * unused)
 
   OLSR_FOR_ALL_DUP_ENTRIES(entry) {
     if (TIMED_OUT(entry->valid_until)) {
-      avl_delete(&duplicate_set, &entry->avl);
+      olsrd_avl_delete(&duplicate_set, &entry->olsrd_avl);
       free(entry);
     }
   }
@@ -143,11 +143,11 @@ olsr_message_is_duplicate(union olsr_message *m)
 
   valid_until = GET_TIMESTAMP(DUPLICATE_VTIME);
 
-  entry = (struct dup_entry *)avl_find(&duplicate_set, ip);
+  entry = (struct dup_entry *)olsrd_avl_find(&duplicate_set, ip);
   if (entry == NULL) {
     entry = olsr_create_duplicate_entry(ip, seqnr);
     if (entry != NULL) {
-      avl_insert(&duplicate_set, &entry->avl, 0);
+      olsrd_avl_insert(&duplicate_set, &entry->olsrd_avl, 0);
       entry->valid_until = valid_until;
     }
     return false;               // okay, we process this package
@@ -209,7 +209,7 @@ olsr_print_duplicate_table(void)
               olsr_wallclock_string(), ipwidth, "Node IP", "DupArray", "VTime");
 
   OLSR_FOR_ALL_DUP_ENTRIES(entry) {
-    OLSR_PRINTF(1, "%-*s %08x %s\n", ipwidth, olsr_ip_to_string(&addrbuf, (union olsr_ip_addr *)(entry->avl.key)),
+    OLSR_PRINTF(1, "%-*s %08x %s\n", ipwidth, olsr_ip_to_string(&addrbuf, (union olsr_ip_addr *)(entry->olsrd_avl.key)),
                 entry->array, olsr_clock_string(entry->valid_until));
   } OLSR_FOR_ALL_DUP_ENTRIES_END(entry);
 }

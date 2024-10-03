@@ -55,7 +55,7 @@
 
 #include "defs.h"
 #include "olsr_types.h"
-#include "common/avl.h"
+#include "common/olsrd_avl.h"
 
 #define TUNNEL_ENDPOINT_IF "tunl0"
 #define TUNNEL_ENDPOINT_IF6 "ip6tnl0"
@@ -67,7 +67,7 @@
 #endif
 
 struct olsr_iptunnel_entry {
-  struct avl_node node;
+  struct olsrd_avl_node node;
   union olsr_ip_addr target;
 
   char if_name[IF_NAMESIZE];

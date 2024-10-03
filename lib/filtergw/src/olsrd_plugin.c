@@ -44,38 +44,32 @@
  */
 
 #include "olsrd_plugin.h"
-#include "olsrd_filtergw.h"
-#include "olsr.h"
 #include "builddata.h"
+#include "olsr.h"
+#include "olsrd_filtergw.h"
 #include <stdio.h>
 
-#define PLUGIN_NAME              "OLSRD filtergw plugin"
+#define PLUGIN_NAME "OLSRD filtergw plugin"
 #define PLUGIN_INTERFACE_VERSION 5
 
 /**
  * "Private" declarations
  */
 
-static void my_init(void) __attribute__ ((constructor));
-static void my_fini(void) __attribute__ ((destructor));
+static void my_init(void) __attribute__((constructor));
+static void my_fini(void) __attribute__((destructor));
 
 /*
  * Defines the version of the plugin interface that is used
  * THIS IS NOT THE VERSION OF YOUR PLUGIN!
  * Do not alter unless you know what you are doing!
  */
-int
-olsrd_plugin_interface_version(void)
-{
-  return PLUGIN_INTERFACE_VERSION;
-}
+int olsrd_plugin_interface_version(void) { return PLUGIN_INTERFACE_VERSION; }
 
 /**
  *Constructor
  */
-void
-my_init(void)
-{
+void my_init(void) {
   /* Print plugin info to stdout */
   olsr_printf(0, "%s (%s)\n", PLUGIN_NAME, git_descriptor);
 }
@@ -83,11 +77,7 @@ my_init(void)
 /**
  *Destructor
  */
-void
-my_fini(void)
-{
-  olsrd_plugin_fini();
-}
+void my_fini(void) { olsrd_plugin_fini(); }
 
 /*
  * Local Variables:

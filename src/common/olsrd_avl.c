@@ -48,83 +48,83 @@
 #include <string.h>
 
 #include "ipcalc.h"
-#include "common/avl.h"
+#include "common/olsrd_avl.h"
 #include "net_olsr.h"
 
 /*
  * default comparison pointers
  * set to the respective compare function.
- * if avl_comp_default is set to zero, a fast
+ * if olsrd_avl_comp_default is set to zero, a fast
  * INLINE ipv4 comparison will be executed.
  */
-avl_tree_comp avl_comp_default = NULL;
-avl_tree_comp avl_comp_prefix_default;
+olsrd_avl_tree_comp olsrd_avl_comp_default = NULL;
+olsrd_avl_tree_comp olsrd_avl_comp_prefix_default;
 
 int
-avl_comp_ipv4(const void *ip1, const void *ip2)
+olsrd_avl_comp_ipv4(const void *ip1, const void *ip2)
 {
   return ip4cmp(ip1, ip2);
 }
 
 int
-avl_comp_ipv6(const void *ip1, const void *ip2)
+olsrd_avl_comp_ipv6(const void *ip1, const void *ip2)
 {
   return ip6cmp(ip1, ip2);
 }
 
 int
-avl_comp_mac(const void *ip1, const void *ip2)
+olsrd_avl_comp_mac(const void *ip1, const void *ip2)
 {
   return memcmp(ip1, ip2, 6);
 }
 
 void
-avl_init(struct avl_tree *tree, avl_tree_comp comp)
+olsrd_avl_init(struct olsrd_avl_tree *tree, olsrd_avl_tree_comp comp)
 {
   tree->root = NULL;
   tree->first = NULL;
   tree->last = NULL;
   tree->count = 0;
 
-  tree->comp = comp == avl_comp_ipv4 ? NULL : comp;
+  tree->comp = comp == olsrd_avl_comp_ipv4 ? NULL : comp;
 }
 
-static struct avl_node *
-avl_find_rec_ipv4(struct avl_node *node, const void *key)
+static struct olsrd_avl_node *
+olsrd_avl_find_rec_ipv4(struct olsrd_avl_node *node, const void *key)
 {
   if (*(const unsigned int *)key < *(const unsigned int *)node->key) {
     if (node->left != NULL)
-      return avl_find_rec_ipv4(node->left, key);
+      return olsrd_avl_find_rec_ipv4(node->left, key);
   }
 
   else if (*(const unsigned int *)key > *(const unsigned int *)node->key) {
     if (node->right != NULL)
-      return avl_find_rec_ipv4(node->right, key);
+      return olsrd_avl_find_rec_ipv4(node->right, key);
   }
 
   return node;
 }
 
-static struct avl_node *
-avl_find_rec(struct avl_node *node, const void *key, avl_tree_comp comp)
+static struct olsrd_avl_node *
+olsrd_avl_find_rec(struct olsrd_avl_node *node, const void *key, olsrd_avl_tree_comp comp)
 {
   int diff;
 
   if (NULL == comp)
-    return avl_find_rec_ipv4(node, key);
+    return olsrd_avl_find_rec_ipv4(node, key);
 
   diff = (*comp) (key, node->key);
 
   if (diff < 0) {
     if (node->left != NULL)
-      return avl_find_rec(node->left, key, comp);
+      return olsrd_avl_find_rec(node->left, key, comp);
 
     return node;
   }
 
   if (diff > 0) {
     if (node->right != NULL)
-      return avl_find_rec(node->right, key, comp);
+      return olsrd_avl_find_rec(node->right, key, comp);
 
     return node;
   }
@@ -132,15 +132,15 @@ avl_find_rec(struct avl_node *node, const void *key, avl_tree_comp comp)
   return node;
 }
 
-struct avl_node *
-avl_find(struct avl_tree *tree, const void *key)
+struct olsrd_avl_node *
+olsrd_avl_find(struct olsrd_avl_tree *tree, const void *key)
 {
-  struct avl_node *node;
+  struct olsrd_avl_node *node;
 
   if (tree->root == NULL)
     return NULL;
 
-  node = avl_find_rec(tree->root, key, tree->comp);
+  node = olsrd_avl_find_rec(tree->root, key, tree->comp);
 
   if (NULL == tree->comp) {
     if (0 != ip4cmp(node->key, key))
@@ -156,9 +156,9 @@ avl_find(struct avl_tree *tree, const void *key)
 }
 
 static void
-avl_rotate_right(struct avl_tree *tree, struct avl_node *node)
+olsrd_avl_rotate_right(struct olsrd_avl_tree *tree, struct olsrd_avl_node *node)
 {
-  struct avl_node *left, *parent;
+  struct olsrd_avl_node *left, *parent;
 
   left = node->left;
   parent = node->parent;
@@ -188,9 +188,9 @@ avl_rotate_right(struct avl_tree *tree, struct avl_node *node)
 }
 
 static void
-avl_rotate_left(struct avl_tree *tree, struct avl_node *node)
+olsrd_avl_rotate_left(struct olsrd_avl_tree *tree, struct olsrd_avl_node *node)
 {
-  struct avl_node *right, *parent;
+  struct olsrd_avl_node *right, *parent;
 
   right = node->right;
   parent = node->parent;
@@ -220,9 +220,9 @@ avl_rotate_left(struct avl_tree *tree, struct avl_node *node)
 }
 
 static void
-post_insert(struct avl_tree *tree, struct avl_node *node)
+post_insert(struct olsrd_avl_tree *tree, struct olsrd_avl_node *node)
 {
-  struct avl_node *parent = node->parent;
+  struct olsrd_avl_node *parent = node->parent;
 
   if (parent == NULL)
     return;
@@ -239,12 +239,12 @@ post_insert(struct avl_tree *tree, struct avl_node *node)
     }
 
     if (node->balance == -1) {
-      avl_rotate_right(tree, parent);
+      olsrd_avl_rotate_right(tree, parent);
       return;
     }
 
-    avl_rotate_left(tree, node);
-    avl_rotate_right(tree, node->parent->parent);
+    olsrd_avl_rotate_left(tree, node);
+    olsrd_avl_rotate_right(tree, node->parent->parent);
     return;
   }
 
@@ -259,16 +259,16 @@ post_insert(struct avl_tree *tree, struct avl_node *node)
   }
 
   if (node->balance == 1) {
-    avl_rotate_left(tree, parent);
+    olsrd_avl_rotate_left(tree, parent);
     return;
   }
 
-  avl_rotate_right(tree, node);
-  avl_rotate_left(tree, node->parent->parent);
+  olsrd_avl_rotate_right(tree, node);
+  olsrd_avl_rotate_left(tree, node->parent->parent);
 }
 
 static void
-avl_insert_before(struct avl_tree *tree, struct avl_node *pos_node, struct avl_node *node)
+olsrd_avl_insert_before(struct olsrd_avl_tree *tree, struct olsrd_avl_node *pos_node, struct olsrd_avl_node *node)
 {
   if (pos_node->prev != NULL)
     pos_node->prev->next = node;
@@ -284,7 +284,7 @@ avl_insert_before(struct avl_tree *tree, struct avl_node *pos_node, struct avl_n
 }
 
 static void
-avl_insert_after(struct avl_tree *tree, struct avl_node *pos_node, struct avl_node *node)
+olsrd_avl_insert_after(struct olsrd_avl_tree *tree, struct olsrd_avl_node *pos_node, struct olsrd_avl_node *node)
 {
   if (pos_node->next != NULL)
     pos_node->next->prev = node;
@@ -300,7 +300,7 @@ avl_insert_after(struct avl_tree *tree, struct avl_node *pos_node, struct avl_no
 }
 
 static void
-avl_remove(struct avl_tree *tree, struct avl_node *node)
+olsrd_avl_remove(struct olsrd_avl_tree *tree, struct olsrd_avl_node *node)
 {
   if (node->prev != NULL)
     node->prev->next = node->next;
@@ -316,10 +316,10 @@ avl_remove(struct avl_tree *tree, struct avl_node *node)
 }
 
 int
-avl_insert(struct avl_tree *tree, struct avl_node *new, int allow_duplicates)
+olsrd_avl_insert(struct olsrd_avl_tree *tree, struct olsrd_avl_node *new, int allow_duplicates)
 {
-  struct avl_node *node;
-  struct avl_node *last;
+  struct olsrd_avl_node *node;
+  struct olsrd_avl_node *last;
   int diff;
 
   new->parent = NULL;
@@ -341,7 +341,7 @@ avl_insert(struct avl_tree *tree, struct avl_node *new, int allow_duplicates)
     return 0;
   }
 
-  node = avl_find_rec(tree->root, new->key, tree->comp);
+  node = olsrd_avl_find_rec(tree->root, new->key, tree->comp);
 
   last = node;
 
@@ -355,17 +355,17 @@ avl_insert(struct avl_tree *tree, struct avl_node *new, int allow_duplicates)
     diff = (*tree->comp) (new->key, node->key);
 
   if (diff == 0) {
-    if (allow_duplicates == AVL_DUP_NO)
+    if (allow_duplicates == OLSRD_AVL_DUP_NO)
       return -1;
 
     new->leader = 0;
 
-    avl_insert_after(tree, last, new);
+    olsrd_avl_insert_after(tree, last, new);
     return 0;
   }
 
   if (node->balance == 1) {
-    avl_insert_before(tree, node, new);
+    olsrd_avl_insert_before(tree, node, new);
 
     node->balance = 0;
     new->parent = node;
@@ -374,7 +374,7 @@ avl_insert(struct avl_tree *tree, struct avl_node *new, int allow_duplicates)
   }
 
   if (node->balance == -1) {
-    avl_insert_after(tree, last, new);
+    olsrd_avl_insert_after(tree, last, new);
 
     node->balance = 0;
     new->parent = node;
@@ -383,7 +383,7 @@ avl_insert(struct avl_tree *tree, struct avl_node *new, int allow_duplicates)
   }
 
   if (diff < 0) {
-    avl_insert_before(tree, node, new);
+    olsrd_avl_insert_before(tree, node, new);
 
     node->balance = -1;
     new->parent = node;
@@ -392,7 +392,7 @@ avl_insert(struct avl_tree *tree, struct avl_node *new, int allow_duplicates)
     return 0;
   }
 
-  avl_insert_after(tree, last, new);
+  olsrd_avl_insert_after(tree, last, new);
 
   node->balance = 1;
   new->parent = node;
@@ -402,9 +402,9 @@ avl_insert(struct avl_tree *tree, struct avl_node *new, int allow_duplicates)
 }
 
 static void
-avl_post_delete(struct avl_tree *tree, struct avl_node *node)
+olsrd_avl_post_delete(struct olsrd_avl_tree *tree, struct olsrd_avl_node *node)
 {
-  struct avl_node *parent;
+  struct olsrd_avl_node *parent;
 
   if ((parent = node->parent) == NULL)
     return;
@@ -413,7 +413,7 @@ avl_post_delete(struct avl_tree *tree, struct avl_node *node)
     parent->balance++;
 
     if (parent->balance == 0) {
-      avl_post_delete(tree, parent);
+      olsrd_avl_post_delete(tree, parent);
       return;
     }
 
@@ -421,26 +421,26 @@ avl_post_delete(struct avl_tree *tree, struct avl_node *node)
       return;
 
     if (parent->right->balance == 0) {
-      avl_rotate_left(tree, parent);
+      olsrd_avl_rotate_left(tree, parent);
       return;
     }
 
     if (parent->right->balance == 1) {
-      avl_rotate_left(tree, parent);
-      avl_post_delete(tree, parent->parent);
+      olsrd_avl_rotate_left(tree, parent);
+      olsrd_avl_post_delete(tree, parent->parent);
       return;
     }
 
-    avl_rotate_right(tree, parent->right);
-    avl_rotate_left(tree, parent);
-    avl_post_delete(tree, parent->parent);
+    olsrd_avl_rotate_right(tree, parent->right);
+    olsrd_avl_rotate_left(tree, parent);
+    olsrd_avl_post_delete(tree, parent->parent);
     return;
   }
 
   parent->balance--;
 
   if (parent->balance == 0) {
-    avl_post_delete(tree, parent);
+    olsrd_avl_post_delete(tree, parent);
     return;
   }
 
@@ -448,23 +448,23 @@ avl_post_delete(struct avl_tree *tree, struct avl_node *node)
     return;
 
   if (parent->left->balance == 0) {
-    avl_rotate_right(tree, parent);
+    olsrd_avl_rotate_right(tree, parent);
     return;
   }
 
   if (parent->left->balance == -1) {
-    avl_rotate_right(tree, parent);
-    avl_post_delete(tree, parent->parent);
+    olsrd_avl_rotate_right(tree, parent);
+    olsrd_avl_post_delete(tree, parent->parent);
     return;
   }
 
-  avl_rotate_left(tree, parent->left);
-  avl_rotate_right(tree, parent);
-  avl_post_delete(tree, parent->parent);
+  olsrd_avl_rotate_left(tree, parent->left);
+  olsrd_avl_rotate_right(tree, parent);
+  olsrd_avl_post_delete(tree, parent->parent);
 }
 
-static struct avl_node *
-avl_local_min(struct avl_node *node)
+static struct olsrd_avl_node *
+olsrd_avl_local_min(struct olsrd_avl_node *node)
 {
   while (node->left != NULL)
     node = node->left;
@@ -473,9 +473,9 @@ avl_local_min(struct avl_node *node)
 }
 
 static void
-avl_delete_worker(struct avl_tree *tree, struct avl_node *node)
+olsrd_avl_delete_worker(struct olsrd_avl_tree *tree, struct olsrd_avl_node *node)
 {
-  struct avl_node *parent, *min;
+  struct olsrd_avl_node *parent, *min;
 
   parent = node->parent;
 
@@ -493,24 +493,24 @@ avl_delete_worker(struct avl_tree *tree, struct avl_node *node)
         return;
 
       if (parent->balance == 0) {
-        avl_post_delete(tree, parent);
+        olsrd_avl_post_delete(tree, parent);
         return;
       }
 
       if (parent->right->balance == 0) {
-        avl_rotate_left(tree, parent);
+        olsrd_avl_rotate_left(tree, parent);
         return;
       }
 
       if (parent->right->balance == 1) {
-        avl_rotate_left(tree, parent);
-        avl_post_delete(tree, parent->parent);
+        olsrd_avl_rotate_left(tree, parent);
+        olsrd_avl_post_delete(tree, parent->parent);
         return;
       }
 
-      avl_rotate_right(tree, parent->right);
-      avl_rotate_left(tree, parent);
-      avl_post_delete(tree, parent->parent);
+      olsrd_avl_rotate_right(tree, parent->right);
+      olsrd_avl_rotate_left(tree, parent);
+      olsrd_avl_post_delete(tree, parent->parent);
     }
     else {
       parent->right = NULL;
@@ -520,24 +520,24 @@ avl_delete_worker(struct avl_tree *tree, struct avl_node *node)
         return;
 
       if (parent->balance == 0) {
-        avl_post_delete(tree, parent);
+        olsrd_avl_post_delete(tree, parent);
         return;
       }
 
       if (parent->left->balance == 0) {
-        avl_rotate_right(tree, parent);
+        olsrd_avl_rotate_right(tree, parent);
         return;
       }
 
       if (parent->left->balance == -1) {
-        avl_rotate_right(tree, parent);
-        avl_post_delete(tree, parent->parent);
+        olsrd_avl_rotate_right(tree, parent);
+        olsrd_avl_post_delete(tree, parent->parent);
         return;
       }
 
-      avl_rotate_left(tree, parent->left);
-      avl_rotate_right(tree, parent);
-      avl_post_delete(tree, parent->parent);
+      olsrd_avl_rotate_left(tree, parent->left);
+      olsrd_avl_rotate_right(tree, parent);
+      olsrd_avl_post_delete(tree, parent->parent);
     }
     return;
   }
@@ -557,7 +557,7 @@ avl_delete_worker(struct avl_tree *tree, struct avl_node *node)
     else
       parent->right = node->right;
 
-    avl_post_delete(tree, node->right);
+    olsrd_avl_post_delete(tree, node->right);
     return;
   }
 
@@ -576,12 +576,12 @@ avl_delete_worker(struct avl_tree *tree, struct avl_node *node)
     else
       parent->right = node->left;
 
-    avl_post_delete(tree, node->left);
+    olsrd_avl_post_delete(tree, node->left);
     return;
   }
 
-  min = avl_local_min(node->right);
-  avl_delete_worker(tree, min);
+  min = olsrd_avl_local_min(node->right);
+  olsrd_avl_delete_worker(tree, min);
   parent = node->parent;
 
   min->balance = node->balance;
@@ -609,12 +609,12 @@ avl_delete_worker(struct avl_tree *tree, struct avl_node *node)
 }
 
 void
-avl_delete(struct avl_tree *tree, struct avl_node *node)
+olsrd_avl_delete(struct olsrd_avl_tree *tree, struct olsrd_avl_node *node)
 {
-  struct avl_node *next;
-  struct avl_node *parent;
-  struct avl_node *left;
-  struct avl_node *right;
+  struct olsrd_avl_node *next;
+  struct olsrd_avl_node *parent;
+  struct olsrd_avl_node *left;
+  struct olsrd_avl_node *right;
 
   if (node->leader != 0) {
     next = node->next;
@@ -650,10 +650,10 @@ avl_delete(struct avl_tree *tree, struct avl_node *node)
     }
 
     else
-      avl_delete_worker(tree, node);
+      olsrd_avl_delete_worker(tree, node);
   }
 
-  avl_remove(tree, node);
+  olsrd_avl_remove(tree, node);
 }
 
 /*

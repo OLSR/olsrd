@@ -50,7 +50,7 @@
 #include "olsr.h"
 #include "scheduler.h"
 #include "olsr_spf.h"
-#include "common/avl.h"
+#include "common/olsrd_avl.h"
 #include "lq_packet.h"
 #include "net_olsr.h"
 #include "lq_plugin.h"
@@ -61,7 +61,7 @@
 #include <assert.h>
 
 /* Root of the link state database */
-struct avl_tree tc_tree;
+struct olsrd_avl_tree tc_tree;
 struct tc_entry *tc_myself;            /* Shortcut to ourselves */
 
 /* Some cookies for stats keeping */
@@ -165,14 +165,14 @@ olsr_add_tc_entry(union olsr_ip_addr *adr)
   /*
    * Insert into the global tc tree.
    */
-  avl_insert(&tc_tree, &tc->vertex_node, AVL_DUP_NO);
+  olsrd_avl_insert(&tc_tree, &tc->vertex_node, OLSRD_AVL_DUP_NO);
   olsr_lock_tc_entry(tc);
 
   /*
    * Initialize subtrees for edges and prefixes.
    */
-  avl_init(&tc->edge_tree, avl_comp_default);
-  avl_init(&tc->prefix_tree, avl_comp_prefix_default);
+  olsrd_avl_init(&tc->edge_tree, olsrd_avl_comp_default);
+  olsrd_avl_init(&tc->prefix_tree, olsrd_avl_comp_prefix_default);
 
   /*
    * Add a rt_path for ourselves.
@@ -191,7 +191,7 @@ olsr_init_tc(void)
 {
   OLSR_PRINTF(5, "TC: init topo\n");
 
-  avl_init(&tc_tree, avl_comp_default);
+  olsrd_avl_init(&tc_tree, olsrd_avl_comp_default);
 
   /*
    * Get some cookies for getting stats to ease troubleshooting.
@@ -308,7 +308,7 @@ olsr_delete_tc_entry(struct tc_entry *tc)
   olsr_stop_timer(tc->validity_timer);
   tc->validity_timer = NULL;
 
-  avl_delete(&tc_tree, &tc->vertex_node);
+  olsrd_avl_delete(&tc_tree, &tc->vertex_node);
   olsr_unlock_tc_entry(tc);
 }
 
@@ -321,9 +321,9 @@ olsr_delete_tc_entry(struct tc_entry *tc)
 struct tc_entry *
 olsr_lookup_tc_entry(union olsr_ip_addr *adr)
 {
-  struct avl_node *node;
+  struct olsrd_avl_node *node;
 
-  node = avl_find(&tc_tree, adr);
+  node = olsrd_avl_find(&tc_tree, adr);
 
   return (node ? vertex_tree2tc(node) : NULL);
 }
@@ -454,7 +454,7 @@ olsr_add_tc_edge_entry(struct tc_entry *tc, union olsr_ip_addr *addr, uint16_t a
   /*
    * Insert into the edge tree.
    */
-  avl_insert(&tc->edge_tree, &tc_edge->edge_node, AVL_DUP_NO);
+  olsrd_avl_insert(&tc->edge_tree, &tc_edge->edge_node, OLSRD_AVL_DUP_NO);
   olsr_lock_tc_entry(tc);
 
   /*
@@ -515,7 +515,7 @@ olsr_delete_tc_edge_entry(struct tc_edge_entry *tc_edge)
 #endif /* DEBUG */
 
   tc = tc_edge->tc;
-  avl_delete(&tc->edge_tree, &tc_edge->edge_node);
+  olsrd_avl_delete(&tc->edge_tree, &tc_edge->edge_node);
   olsr_unlock_tc_entry(tc);
 
   /*
@@ -572,7 +572,7 @@ olsr_delete_revoked_tc_edges(struct tc_entry *tc, uint16_t ansn, union olsr_ip_a
 
   OLSR_FOR_ALL_TC_EDGE_ENTRIES(tc, tc_edge) {
     if (!passedLowerBorder) {
-      if (avl_comp_default(lower_border, &tc_edge->T_dest_addr) <= 0) {
+      if (olsrd_avl_comp_default(lower_border, &tc_edge->T_dest_addr) <= 0) {
         passedLowerBorder = true;
       } else {
         continue;
@@ -580,7 +580,7 @@ olsr_delete_revoked_tc_edges(struct tc_entry *tc, uint16_t ansn, union olsr_ip_a
     }
 
     if (passedLowerBorder) {
-      if (avl_comp_default(upper_border, &tc_edge->T_dest_addr) <= 0) {
+      if (olsrd_avl_comp_default(upper_border, &tc_edge->T_dest_addr) <= 0) {
         break;
       }
     }
@@ -680,9 +680,9 @@ olsr_tc_update_edge(struct tc_entry *tc, uint16_t ansn, const unsigned char **cu
 struct tc_edge_entry *
 olsr_lookup_tc_edge(struct tc_entry *tc, union olsr_ip_addr *edge_addr)
 {
-  struct avl_node *edge_node;
+  struct olsrd_avl_node *edge_node;
 
-  edge_node = avl_find(&tc->edge_tree, edge_addr);
+  edge_node = olsrd_avl_find(&tc->edge_tree, edge_addr);
 
   return (edge_node ? edge_tree2tc_edge(edge_node) : NULL);
 }

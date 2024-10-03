@@ -45,40 +45,46 @@
 
 #include <arpa/inet.h>
 
-#include "olsr_types.h"
-#include "olsrd_filtergw.h"
-#include "olsr.h"
 #include "defs.h"
 #include "ipcalc.h"
-#include "scheduler.h"
 #include "log.h"
-#include "routing_table.h"
+#include "olsr.h"
 #include "olsr_cfg.h"
+#include "olsr_types.h"
+#include "olsrd_filtergw.h"
+#include "parser.h"
+#include "routing_table.h"
+#include "scheduler.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <sys/time.h>
-#include <net/route.h>
-#include <unistd.h>
 #include <errno.h>
+#include <net/route.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/time.h>
 #include <time.h>
+#include <unistd.h>
 
 static int is_allowlist = 0;
 
-static struct filter_list * add_to_filter_list(const char *, struct filter_list *);
+static struct filter_list *add_to_filter_list(const char *,
+                                              struct filter_list *);
 
 struct originator_list {
-  union olsr_ip_addr        originator;
-  struct originator_list *  next;
+  union olsr_ip_addr originator;
+  struct originator_list *next;
 };
 
 struct filter_group {
-  struct originator_list *  originator_list;
-  struct hna_group *        next;
+  struct originator_list *originator_list;
+  struct filter_group *next;
 };
 
-static struct filter_group * filter_groups = NULL;
+static struct filter_group *filter_groups = NULL;
+
+// Delcaring function prototype here, fixes build error with clang-16
+// Refer: https://bugs.gentoo.org/898090
+int should_filter(union olsr_ip_addr *originator);
 
 /* -------------------------------------------------------------------------
  * Function   : add_to_originator_list
@@ -91,8 +97,8 @@ static struct filter_group * filter_groups = NULL;
  * ------------------------------------------------------------------------- */
 /* add the valid IPs to the head of the list */
 static struct originator_list *
-add_to_originator_list(union olsr_ip_addr * originator_address, struct originator_list *the_originator_list)
-{
+add_to_originator_list(union olsr_ip_addr *originator_address,
+                       struct originator_list *the_originator_list) {
   struct originator_list *new = calloc(1, sizeof(struct originator_list));
   if (!new) {
     olsr_exit("FILTERGW: Out of memory", EXIT_FAILURE);
@@ -105,9 +111,10 @@ add_to_originator_list(union olsr_ip_addr * originator_address, struct originato
 /**
  * read config file parameters
  */
-static int
-set_plugin_filter(const char *value, void *data __attribute__ ((unused)), set_plugin_parameter_addon addon __attribute__ ((unused)))
-{
+static int set_plugin_filter(const char *value,
+                             void *data __attribute__((unused)),
+                             set_plugin_parameter_addon addon
+                             __attribute__((unused))) {
   union olsr_ip_addr addr;
 
   if (inet_pton(olsr_cnf->ip_version, value, &addr) <= 0) {
@@ -116,15 +123,16 @@ set_plugin_filter(const char *value, void *data __attribute__ ((unused)), set_pl
   }
 
   if (filter_groups == NULL) {
-      struct filter_group *new = calloc(1, sizeof(struct filter_group));
-      if (new == NULL) {
-        olsr_exit("FILTERGW: Out of memory", EXIT_FAILURE);
-      }
-      filter_groups = new;
-      new->next =  filter_groups;
+    struct filter_group *new = calloc(1, sizeof(struct filter_group));
+    if (new == NULL) {
+      olsr_exit("FILTERGW: Out of memory", EXIT_FAILURE);
+    }
+    filter_groups = new;
+    new->next = filter_groups;
   }
 
-  filter_groups->originator_list = add_to_originator_list(&addr, filter_groups->originator_list);
+  filter_groups->originator_list =
+      add_to_originator_list(&addr, filter_groups->originator_list);
 
   return 0;
 }
@@ -140,12 +148,9 @@ set_plugin_filter(const char *value, void *data __attribute__ ((unused)), set_pl
  * Return     : false if message should be supressed, true otherwise
  * Data Used  : none
  * ------------------------------------------------------------------------- */
-bool
-olsrd_filtergw_parser(
-    union olsr_message *m,
-    struct interface_olsr *in_if __attribute__ ((unused)),
-    union olsr_ip_addr *ipaddr __attribute__ ((unused))
-){
+bool olsrd_filtergw_parser(union olsr_message *m,
+                           struct interface_olsr *in_if __attribute__((unused)),
+                           union olsr_ip_addr *ipaddr __attribute__((unused))) {
 
   uint8_t olsr_msgtype;
   olsr_reltime vtime;
@@ -183,8 +188,7 @@ olsrd_filtergw_parser(
   pkt_get_ipaddress(&curr, &originator);
   /*printf("HNA from %s\n\n", olsr_ip_to_string(&buf, &originator)); */
 
-  if(!should_filter(&originator))
-  {
+  if (!should_filter(&originator)) {
     return true;
   }
 
@@ -205,7 +209,7 @@ olsrd_filtergw_parser(
 
   if ((hnasize % (2 * olsr_cnf->ipsize)) != 0) {
     OLSR_PRINTF(1, "Illegal HNA message from %s with size %d!\n",
-        olsr_ip_to_string(&buf, &originator), olsr_msgsize);
+                olsr_ip_to_string(&buf, &originator), olsr_msgsize);
     return false;
   }
 
@@ -232,9 +236,7 @@ olsrd_filtergw_parser(
         continue;
       }
       return false;
-    }
-    else
-    {
+    } else {
       curr_hna += 2 * olsr_cnf->ipsize;
     }
   }
@@ -242,35 +244,36 @@ olsrd_filtergw_parser(
 }
 
 static const struct olsrd_plugin_parameters plugin_parameters[] = {
-    {.name = "originator", .set_plugin_parameter = &set_plugin_filter, .data = NULL},
-    {.name = "allowlist", .set_plugin_parameter = &set_plugin_int,  .data = &is_allowlist},
+    {.name = "originator",
+     .set_plugin_parameter = &set_plugin_filter,
+     .data = NULL},
+    {.name = "allowlist",
+     .set_plugin_parameter = &set_plugin_int,
+     .data = &is_allowlist},
 };
 
-void
-olsrd_get_plugin_parameters(const struct olsrd_plugin_parameters **params, int *size)
-{
+void olsrd_get_plugin_parameters(const struct olsrd_plugin_parameters **params,
+                                 int *size) {
   *params = plugin_parameters;
   *size = sizeof(plugin_parameters) / sizeof(*plugin_parameters);
 }
 
-int
-olsrd_plugin_init(void)
-{
+int olsrd_plugin_init(void) {
   olsr_parser_add_function(&olsrd_filtergw_parser, HNA_MESSAGE);
   return 1;
 }
 
 void olsrd_plugin_fini(void) {
-  while(filter_groups) {
+  while (filter_groups) {
 
     while (filter_groups->originator_list) {
-      struct originator_list* next = filter_groups->originator_list->next;
+      struct originator_list *next = filter_groups->originator_list->next;
       // free(&filter_groups->originator_list->originator);
       free(filter_groups->originator_list);
       filter_groups->originator_list = next;
     }
 
-    struct filter_group* next = filter_groups->next;
+    struct filter_group *next = filter_groups->next;
     free(filter_groups);
   }
 }
@@ -284,12 +287,10 @@ void olsrd_plugin_fini(void) {
  * Return     : false if gw should note be supressed, true otherwise
  * Data Used  : none
  * ------------------------------------------------------------------------- */
-int should_filter(union olsr_ip_addr * originator)
-{
+int should_filter(union olsr_ip_addr *originator) {
   int found = 0;
 
-  if(filter_groups == NULL)
-  {
+  if (filter_groups == NULL) {
     /* if it is allow list but no entry, filter every GW announcement */
     return is_allowlist;
   }
@@ -297,8 +298,7 @@ int should_filter(union olsr_ip_addr * originator)
   /* for now we only have 1 list entry */
   struct originator_list *list = filter_groups->originator_list;
   for (list = filter_groups->originator_list; list; list = list->next) {
-    if(ipequal(&list->originator, originator))
-    {
+    if (ipequal(&list->originator, originator)) {
       found = 1;
       break;
     }

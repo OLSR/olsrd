@@ -50,7 +50,7 @@
 #include "packet.h"
 #include "olsr.h"
 #include "two_hop_neighbor_table.h"
-#include "common/avl.h"
+#include "common/olsrd_avl.h"
 
 #include "lq_plugin_default_float.h"
 #include "lq_plugin_default_fpm.h"
@@ -64,17 +64,17 @@
 #include <assert.h>
 #include <math.h>
 
-struct avl_tree lq_handler_tree;
+struct olsrd_avl_tree lq_handler_tree;
 struct lq_handler *active_lq_handler = NULL;
 
 /**
- * case-insensitive string comparator for avl-trees
+ * case-insensitive string comparator for olsrd_avl-trees
  * @param str1
  * @param str2
  * @return
  */
 int
-avl_strcasecmp(const void *str1, const void *str2)
+olsrd_avl_strcasecmp(const void *str1, const void *str2)
 {
   return strcasecmp(str1, str2);
 }
@@ -88,7 +88,7 @@ activate_lq_handler(const char *name)
 {
   struct lq_handler_node *node;
 
-  node = (struct lq_handler_node *)avl_find(&lq_handler_tree, name);
+  node = (struct lq_handler_node *)olsrd_avl_find(&lq_handler_tree, name);
   if (node == NULL) {
     char buf[1024];
     snprintf(buf, sizeof(buf), "Error, unknown lq_handler '%s'", name);
@@ -106,7 +106,7 @@ activate_lq_handler(const char *name)
 void
 init_lq_handler_tree(void)
 {
-  avl_init(&lq_handler_tree, &avl_strcasecmp);
+  olsrd_avl_init(&lq_handler_tree, &olsrd_avl_strcasecmp);
   register_lq_handler(&lq_etx_float_handler, LQ_ALGORITHM_ETX_FLOAT_NAME);
   register_lq_handler(&lq_etx_fpm_handler, LQ_ALGORITHM_ETX_FPM_NAME);
   register_lq_handler(&lq_etx_ff_handler, LQ_ALGORITHM_ETX_FF_NAME);
@@ -147,7 +147,7 @@ register_lq_handler(struct lq_handler *handler, const char *name)
   node->node.key = node->name;
   node->handler = handler;
 
-  avl_insert(&lq_handler_tree, &node->node, false);
+  olsrd_avl_insert(&lq_handler_tree, &node->node, false);
 }
 
 /**
