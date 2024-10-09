@@ -58,6 +58,9 @@ include $(TOPDIR)/Makefile.inc
 PUD_NMEALIB_STATICALLY_LINKED ?=
 CFLAGS += -D_GNU_SOURCE
 
+LIBGPS_VERSION := $(shell $(PKG_CONFIG) --modversion libgps)
+CFLAGS += -DLIBGPS_VERSION_MAJOR=$(word 1,$(subst ., ,$(LIBGPS_VERSION)))
+CFLAGS += -DLIBGPS_VERSION_MINOR=$(word 2,$(subst ., ,$(LIBGPS_VERSION)))
 
 RESOURCESDIR = ./resources
 NMEALIB_LIB = $(NMEALIB_PATH)/lib
