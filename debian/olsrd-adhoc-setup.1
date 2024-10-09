@@ -1,0 +1,36 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.TH olsrd-adhoc-setup 1 "2012"
+.SH NAME
+olsrd-adhoc-setup \- setup the wifi interface for meshing with olsrd
+.SH SYNOPSIS
+.B olsrd-adhoc-setup
+[
+.B "wifi interface"
+]
+[
+.B "channel"
+]
+[
+.B "SSID"
+]
+[
+.B "BSSID"
+]
+.SH DESCRIPTION
+This manual page documents briefly the
+.B olsrd-adhoc-setup
+command.  In order to run
+.B olsrd
+to connect to a mesh network, the wifi interface needs to first
+be setup in adhoc mode with the correct settings and a usable IP address
+in order for your
+.B olsrd
+to start talking to the rest of the mesh.  This script automates that process.
+.
+.PP
+.SH SEE ALSO
+.BR olsrd (8),
+.BR olsrd-conf (5).
+.br
+.SH AUTHOR
+olsrd-adhoc-setup was written by Hans-Christoph Steiner <hans@eds.org>

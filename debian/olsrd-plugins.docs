@@ -1,0 +1,16 @@
+lib/dyn_gw/README_DYN_GW
+lib/httpinfo/README_HTTPINFO
+lib/dot_draw/README_DOT_DRAW
+lib/nameservice/README_NAMESERVICE
+lib/secure/README_SECURE
+lib/bmf/README_BMF
+lib/quagga/README_QUAGGA
+lib/txtinfo/README_TXTINFO
+lib/watchdog/README_WATCHDOG
+lib/mini/README_MINI
+lib/pgraph/README_PGRAPH
+lib/mdns/README_MDNS
+lib/p2pd/README_P2PD
+lib/arprefresh/README_ARPREFRESH
+lib/dot_draw/README_DOT_DRAW
+lib/dyn_gw_plain/README_DYN_GW_PLAIN
