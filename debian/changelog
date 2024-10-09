@@ -1,3 +1,14 @@
+olsrd (0.9.8-4) UNRELEASED; urgency=medium
+
+  * fix libgps
+  * fix compilation with gcc 14
+  * cleanup filtergw plugin
+  * fix build error with clang 16
+  * rename avl to olsrd_avl
+  * add debian packaging
+
+ -- Opennet Initiative <dev@opennet-initiative.de>  Sun, 9 OctApr 2024 07:30:34 +0200
+
 olsrd (0.9.8-3) UNRELEASED; urgency=medium
 
   * update patch series, improved prefix and libdir patch
