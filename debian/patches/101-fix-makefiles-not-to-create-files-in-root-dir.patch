@@ -1,0 +1,61 @@
+---
+ Makefile                 | 10 +++++-----
+ lib/pud/Makefile         |  4 ++--
+ lib/sgwdynspeed/Makefile |  4 ++--
+ 3 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 430a4e2..8c3ce2e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -174,12 +174,12 @@ install_olsrd:	install_bin
+ 		@echo per default.
+ 		@echo can be found at files/olsrd.conf.default.lq
+ 		@echo ==========================================================
+-		mkdir -p $(ETCDIR)
+-		$(MAKECMDPREFIX)if [ -e $(CFGFILE) ]; then \
+-			cp -f files/olsrd.conf.default.lq $(CFGFILE).new; \
+-			echo "Configuration file was saved as $(CFGFILE).new"; \
++		mkdir -p ${TOPDIR}$(ETCDIR)
++		$(MAKECMDPREFIX)if [ -e ${TOPDIR}$(CFGFILE) ]; then \
++			cp -f files/olsrd.conf.default.lq ${TOPDIR}$(CFGFILE).new; \
++			echo "Configuration file was saved as ${TOPDIR}$(CFGFILE).new"; \
+ 		else \
+-			cp -f files/olsrd.conf.default.lq $(CFGFILE); \
++			cp -f files/olsrd.conf.default.lq ${TOPDIR}$(CFGFILE); \
+ 		fi
+ 		@echo -------------------------------------------
+ 		@echo Edit $(CFGFILE) before running olsrd!!
+diff --git a/lib/pud/Makefile b/lib/pud/Makefile
+index e252442..f5df577 100644
+--- a/lib/pud/Makefile
++++ b/lib/pud/Makefile
+@@ -125,8 +125,8 @@ install: all
+ 	$(MAKECMDPREFIX)$(MAKE) -C "$(NMEALIB_PATH)" DESTDIR="$(DESTDIR)" install
+ 	$(MAKECMDPREFIX)$(MAKE) -C "$(LIBRARY_PATH)" DESTDIR="$(DESTDIR)" install
+ 	$(INSTALL_LIB)
+-	mkdir -p "$(ETCDIR)"
+-	cp "$(RESOURCESDIR)/olsrd.pud.position.conf" "$(ETCDIR)"
++	mkdir -p "${TOPDIR}$(ETCDIR)"
++	cp "$(RESOURCESDIR)/olsrd.pud.position.conf" "${TOPDIR}$(ETCDIR)"
+ 	$(STRIP) "$(LIBDIR)/$(PLUGIN_FULLNAME)"
+ ifneq ($(DOCDIR_OLSRD),)
+ 	mkdir -p "$(DOCDIR_OLSRD)"
+diff --git a/lib/sgwdynspeed/Makefile b/lib/sgwdynspeed/Makefile
+index 1a7a550..50c6ce6 100644
+--- a/lib/sgwdynspeed/Makefile
++++ b/lib/sgwdynspeed/Makefile
+@@ -85,8 +85,8 @@ endif
+ 
+ install: all
+ 	$(INSTALL_LIB)
+-	mkdir -p "$(ETCDIR)"
+-	cp "$(RESOURCESDIR)/olsrd.sgw.speed.conf" "$(ETCDIR)"
++	mkdir -p "${TOPDIR}$(ETCDIR)"
++	cp "$(RESOURCESDIR)/olsrd.sgw.speed.conf" "${TOPDIR}$(ETCDIR)"
+ 	$(STRIP) "$(LIBDIR)/$(PLUGIN_FULLNAME)"
+ ifneq ($(DOCDIR_OLSRD),)
+ 	mkdir -p "$(DOCDIR_OLSRD)"
+-- 
+2.20.1
+

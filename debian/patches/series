@@ -1,3 +1,4 @@
+101-fix-makefiles-not-to-create-files-in-root-dir.patch
 111-build-mips-and-armhf.patch
 120-deactivate-gtk.patch
 130-debian-prefix-libdir.patch
