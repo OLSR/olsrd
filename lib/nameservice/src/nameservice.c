@@ -567,7 +567,8 @@ olsr_start_write_file_timer(void)
     return;
   }
 
-  write_file_timer = olsr_start_timer(my_filewrite_interval * MSEC_PER_SEC, 5, OLSR_TIMER_ONESHOT, olsr_expire_write_file_timer, NULL, 0);
+  // set jitter (second param) to 0, to get deterministic write-intervals
+  write_file_timer = olsr_start_timer(my_filewrite_interval * MSEC_PER_SEC, 0, OLSR_TIMER_ONESHOT, olsr_expire_write_file_timer, NULL, 0);
 }
 
 /*
