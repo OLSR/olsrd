@@ -81,6 +81,8 @@ bool changes_neighborhood;
 bool changes_hna;
 bool changes_force;
 
+bool olsr_shutdown_registered = false;
+
 /*COLLECT startup sleeps caused by warnings*/
 
 #ifdef OLSR_COLLECT_STARTUP_SLEEP
@@ -576,7 +578,13 @@ olsr_exit(const char *msg, int val)
     olsr_cnf->exit_value = val;
   }
 
-  raise(SIGTERM);
+  /* Only take the orderly shutdown path once olsr_shutdown() is
+   * installed. Before that, SIGTERM still has its default disposition
+   * and raise() would kill us outright, so the exit() below would never
+   * run and the process would report 143 instead of val. */
+  if (olsr_shutdown_registered) {
+    raise(SIGTERM);
+  }
 
   /* in case the signal handler was not setup yet */
   exit(val);

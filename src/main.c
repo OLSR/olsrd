@@ -771,6 +771,8 @@ int main(int argc, char *argv[]) {
   signal(SIGUSR2, SIG_IGN);
 #endif /* _WIN32 */
 
+  olsr_shutdown_registered = true;
+
   /* Starting scheduler */
   olsr_scheduler();
 

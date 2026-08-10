@@ -54,6 +54,8 @@ extern bool changes_neighborhood;
 extern bool changes_hna;
 extern bool changes_force;
 
+extern bool olsr_shutdown_registered;
+
 extern union olsr_ip_addr all_zero;
 
 void get_argc_argv(int *argc, char **argv[]);
