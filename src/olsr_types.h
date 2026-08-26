@@ -82,7 +82,8 @@ typedef signed int int32_t;
 
 /* add some safe-gaurds */
 #ifndef _MSC_VER
-#if !defined bool || !defined true || !defined false || !defined __bool_true_false_are_defined
+#if (!defined __STDC_VERSION__ || __STDC_VERSION__ < 202311L) && \
+    (!defined bool || !defined true || !defined false || !defined __bool_true_false_are_defined)
 #error You have no C99-like boolean types. Please extend src/olsr_type.h!
 #endif /* !defined bool || !defined true || !defined false || !defined __bool_true_false_are_defined */
 #endif /* _MSC_VER */
