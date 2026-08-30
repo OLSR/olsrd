@@ -86,6 +86,7 @@
 #include <linux/types.h>
 #include <linux/rtnetlink.h>
 #include "kernel_routes.h"
+#include "route_import.h"
 
 #endif /* __linux__ */
 
@@ -560,6 +561,9 @@ int main(int argc, char *argv[]) {
 
   /* create a socket for netlink calls */
 #ifdef __linux__
+  {
+  int rtnetlink_groups = RTMGRP_LINK;
+
   olsr_cnf->rtnl_s = socket(PF_NETLINK, SOCK_DGRAM, NETLINK_ROUTE);
   if (olsr_cnf->rtnl_s < 0) {
     char buf2[1024];
@@ -571,10 +575,17 @@ int main(int argc, char *argv[]) {
     olsr_syslog(OLSR_LOG_INFO, "rtnetlink could not be set to nonblocking");
   }
 
-  if ((olsr_cnf->rt_monitor_socket = rtnetlink_register_socket(RTMGRP_LINK)) < 0) {
+  /* only ask the kernel for route changes when something wants them: a
+   * busy table would otherwise wake olsrd on every neighbour's update */
+  if (olsr_cnf->import_proto != 0) {
+    rtnetlink_groups |= (olsr_cnf->ip_version == AF_INET) ? RTMGRP_IPV4_ROUTE : RTMGRP_IPV6_ROUTE;
+  }
+
+  if ((olsr_cnf->rt_monitor_socket = rtnetlink_register_socket(rtnetlink_groups)) < 0) {
     char buf2[1024];
     snprintf(buf2, sizeof(buf2), "rtmonitor socket: %s", strerror(errno));
     olsr_exit(buf2, EXIT_FAILURE);
+  }
   }
 #endif /* __linux__ */
 
@@ -772,6 +783,9 @@ int main(int argc, char *argv[]) {
 #endif /* _WIN32 */
 
   olsr_shutdown_registered = true;
+
+  /* seed the HNA list from what is already in the routing table */
+  route_import_init();
 
   /* Starting scheduler */
   olsr_scheduler();

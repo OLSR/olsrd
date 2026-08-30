@@ -1049,6 +1049,10 @@ olsrd_free_cnf(struct olsrd_config **cnfVariableAddress)
 
   ip_prefix_list_clear(&cnf->hna_entries);
 
+  ip_prefix_list_clear(&cnf->import_prefixes);
+
+  ip_prefix_list_clear(&cnf->import_prefixes);
+
   while (cnf->plugins) {
     struct plugin_entry *plugin = cnf->plugins;
     cnf->plugins = cnf->plugins->next;
@@ -1095,6 +1099,10 @@ set_default_cnf(struct olsrd_config *cnf, char * configuration_file)
   cnf->allow_no_interfaces = DEF_ALLOW_NO_INTS;
   cnf->tos = DEF_TOS;
   cnf->rt_proto = DEF_RTPROTO;
+  cnf->import_proto = DEF_IMPORTPROTO;
+  cnf->import_prefixes = NULL;
+  cnf->import_proto = DEF_IMPORTPROTO;
+  cnf->import_prefixes = NULL;
   cnf->rt_table = DEF_RT_AUTO;
   cnf->rt_table_default = DEF_RT_AUTO;
   cnf->rt_table_tunnel = DEF_RT_AUTO;
