@@ -82,7 +82,6 @@
 #define DEF_OLSRPORT         698
 #define DEF_RTPROTO          0 /* 0 means OS-specific default */
 #define DEF_IMPORTPROTO      0 /* 0 disables the route import */
-#define DEF_IMPORTPROTO      0 /* 0 disables the route import */
 #define DEF_RT_NONE          -1
 #define DEF_RT_AUTO          0
 

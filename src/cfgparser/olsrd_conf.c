@@ -1101,8 +1101,6 @@ set_default_cnf(struct olsrd_config *cnf, char * configuration_file)
   cnf->rt_proto = DEF_RTPROTO;
   cnf->import_proto = DEF_IMPORTPROTO;
   cnf->import_prefixes = NULL;
-  cnf->import_proto = DEF_IMPORTPROTO;
-  cnf->import_prefixes = NULL;
   cnf->rt_table = DEF_RT_AUTO;
   cnf->rt_table_default = DEF_RT_AUTO;
   cnf->rt_table_tunnel = DEF_RT_AUTO;
