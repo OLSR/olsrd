@@ -81,6 +81,7 @@
 #define DEF_CLEAR_SCREEN     true
 #define DEF_OLSRPORT         698
 #define DEF_RTPROTO          0 /* 0 means OS-specific default */
+#define DEF_IMPORTPROTO      0 /* 0 disables the route import */
 #define DEF_RT_NONE          -1
 #define DEF_RT_AUTO          0
 
@@ -303,6 +304,10 @@ struct olsrd_config {
   struct hyst_param hysteresis_param;
   struct plugin_entry *plugins;
   struct ip_prefix_list *hna_entries;
+  /* route protocol whose host routes become HNAs, 0 to disable */
+  uint8_t import_proto;
+  /* optional whitelist bounding what import_proto may announce */
+  struct ip_prefix_list *import_prefixes;
   struct ip_prefix_list *ipc_nets;
   struct if_config_options *interface_defaults;
   struct olsr_if *interfaces;
@@ -416,6 +421,8 @@ extern "C" {
   void ip_prefix_list_add(struct ip_prefix_list **, const union olsr_ip_addr *, uint8_t);
 
   int ip_prefix_list_remove(struct ip_prefix_list **, const union olsr_ip_addr *, uint8_t);
+
+  void ip_prefix_list_clear(struct ip_prefix_list **list);
 
   struct ip_prefix_list *ip_prefix_list_find(struct ip_prefix_list *, const union olsr_ip_addr *net, uint8_t prefix_len);
 

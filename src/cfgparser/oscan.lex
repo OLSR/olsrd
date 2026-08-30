@@ -354,6 +354,16 @@ IPV6ADDR {IPV6PAT1}|{IPV6PAT2}|{IPV6PAT3}|{IPV6PAT4}|{IPV6PAT5}|{IPV6PAT6}|{IPV6
   return TOK_OLSRPORT;
 }
 
+"ImportProto" {
+  yylval = NULL;
+  return TOK_IMPORTPROTO;
+}
+
+"ImportPrefix" {
+  yylval = NULL;
+  return TOK_IMPORTPREFIX;
+}
+
 "RtProto" {
   olsrd_config_checksum_add(yytext, yyleng);
   yylval = NULL;
