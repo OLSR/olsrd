@@ -732,6 +732,17 @@ olsr_calculate_tc_border(uint8_t lower_border, union olsr_ip_addr *lower_border_
   if (lower_border == 0 && upper_border == 0) {
     return 0;
   }
+
+  /*
+   * A border flag is either 0xff or a bit position between 1 and the
+   * address length in bits. Anything else would index outside the
+   * border ip below, so ignore the borders of this message.
+   */
+  if ((lower_border != 0xff && (lower_border == 0 || lower_border > olsr_cnf->ipsize * 8))
+      || (upper_border != 0xff && (upper_border == 0 || upper_border > olsr_cnf->ipsize * 8))) {
+    return 0;
+  }
+
   if (lower_border == 0xff) {
     memset(lower_border_ip, 0, sizeof(*lower_border_ip));
   } else {
