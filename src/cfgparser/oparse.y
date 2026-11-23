@@ -192,6 +192,8 @@ static int add_ipv6_addr(YYSTYPE ipaddr_arg, YYSTYPE prefixlen_arg)
 %token TOK_TOS
 %token TOK_OLSRPORT
 %token TOK_RTPROTO
+%token TOK_IMPORTPROTO
+%token TOK_IMPORTPREFIX
 %token TOK_RTTABLE
 %token TOK_RTTABLE_DEFAULT
 %token TOK_RTTABLE_TUNNEL
@@ -296,6 +298,8 @@ stmt:       idebug
           | atos
           | aolsrport
           | irtproto
+          | iimportproto
+          | iimportprefix
           | irttable
           | irttable_default
           | irttable_tunnel
@@ -1059,6 +1063,66 @@ aolsrport: TOK_OLSRPORT TOK_INTEGER
   PARSER_DEBUG_PRINTF("OlsrPort: %d\n", $2->integer);
   olsr_cnf->olsrport = $2->integer;
   free($2);
+}
+;
+
+iimportproto: TOK_IMPORTPROTO TOK_INTEGER
+{
+  PARSER_DEBUG_PRINTF("ImportProto: %d\n", $2->integer);
+  olsr_cnf->import_proto = $2->integer;
+  free($2);
+}
+;
+
+iimportprefix: TOK_IMPORTPREFIX TOK_IPV4_ADDR TOK_SLASH TOK_INTEGER
+{
+  union olsr_ip_addr ipaddr;
+
+  if (olsr_cnf->ip_version == AF_INET6) {
+    fprintf(stderr, "IPv4 addresses can only be used if \"IpVersion\" == 4, skipping ImportPrefix.\n");
+    olsr_startup_sleep(3);
+  } else {
+    PARSER_DEBUG_PRINTF("ImportPrefix: %s/%d\n", $2->string, $4->integer);
+
+    if (inet_pton(AF_INET, $2->string, &ipaddr.v4) <= 0) {
+      fprintf(stderr, "iimportprefix: Failed converting IP address %s\n", $2->string);
+      YYABORT;
+    }
+    if ($4->integer > olsr_cnf->maxplen) {
+      fprintf(stderr, "iimportprefix: Prefix len %u > %d is not allowed!\n", $4->integer, olsr_cnf->maxplen);
+      YYABORT;
+    }
+
+    ip_prefix_list_add(&olsr_cnf->import_prefixes, &ipaddr, $4->integer);
+  }
+  free($2->string);
+  free($2);
+  free($4);
+}
+        |     TOK_IMPORTPREFIX TOK_IPV6_ADDR TOK_SLASH TOK_INTEGER
+{
+  union olsr_ip_addr ipaddr;
+
+  if (olsr_cnf->ip_version == AF_INET) {
+    fprintf(stderr, "IPv6 addresses can only be used if \"IpVersion\" == 6, skipping ImportPrefix.\n");
+    olsr_startup_sleep(3);
+  } else {
+    PARSER_DEBUG_PRINTF("ImportPrefix: %s/%d\n", $2->string, $4->integer);
+
+    if (inet_pton(AF_INET6, $2->string, &ipaddr.v6) <= 0) {
+      fprintf(stderr, "iimportprefix: Failed converting IP address %s\n", $2->string);
+      YYABORT;
+    }
+    if ($4->integer > olsr_cnf->maxplen) {
+      fprintf(stderr, "iimportprefix: Prefix len %u > %d is not allowed!\n", $4->integer, olsr_cnf->maxplen);
+      YYABORT;
+    }
+
+    ip_prefix_list_add(&olsr_cnf->import_prefixes, &ipaddr, $4->integer);
+  }
+  free($2->string);
+  free($2);
+  free($4);
 }
 ;
 

@@ -50,6 +50,8 @@
 #include "log.h"
 #include "net_os.h"
 #include "ifnet.h"
+#include "olsr.h"
+#include "route_import.h"
 
 #include <assert.h>
 #include <linux/types.h>
@@ -166,14 +168,32 @@ static void rtnetlink_read(int sock, void *data __attribute__ ((unused)), unsign
     .msg_flags = 0,
   };
 
-  char buffer[4096];
+  /* route messages carry more attributes than a link message and can
+   * outgrow a fixed buffer; size each one from a peek first */
+  int bufsize = 4096;
+  char *buffer = olsr_malloc(bufsize, "netlink receive buffer");
   struct nlmsghdr *nlh = (struct nlmsghdr *)ARM_NOWARN_ALIGN(buffer);
   int ret;
 
   iov.iov_base = (void *) buffer;
-  iov.iov_len = sizeof(buffer);
+  iov.iov_len = bufsize;
 
-  while ((ret = recvmsg(sock, &msg, MSG_DONTWAIT)) >= 0) {
+  while ((ret = recvmsg(sock, &msg, MSG_DONTWAIT | MSG_TRUNC | MSG_PEEK)) >= 0) {
+    if (ret > bufsize) {
+      free(buffer);
+      buffer = olsr_malloc(ret, "netlink receive buffer expansion");
+      bufsize = ret;
+
+      iov.iov_base = (void *) buffer;
+      iov.iov_len = bufsize;
+      nlh = (struct nlmsghdr *)ARM_NOWARN_ALIGN(buffer);
+    }
+
+    ret = recvmsg(sock, &msg, MSG_DONTWAIT);
+    if (ret < 0) {
+      goto end;
+    }
+
     /*check message*/
     len = nlh->nlmsg_len;
     plen = len - sizeof(nlh);
@@ -181,7 +201,7 @@ static void rtnetlink_read(int sock, void *data __attribute__ ((unused)), unsign
       OLSR_PRINTF(1,"Malformed netlink message: "
              "len=%d left=%d plen=%d\n",
               len, ret, plen);
-      return;
+      goto end;
     }
 
     OLSR_PRINTF(3, "Netlink message received: type 0x%x\n", nlh->nlmsg_type);
@@ -189,11 +209,18 @@ static void rtnetlink_read(int sock, void *data __attribute__ ((unused)), unsign
       /* handle ifup/ifdown */
       netlink_process_link(nlh);
     }
+
+    if ((nlh->nlmsg_type == RTM_NEWROUTE) || (nlh->nlmsg_type == RTM_DELROUTE)) {
+      /* another daemon's route came or went - see ImportProto */
+      process_import_nlh(nlh, nlh->nlmsg_type == RTM_DELROUTE);
+    }
   }
 
   if (errno != EAGAIN) {
     OLSR_PRINTF(1,"netlink listen error %u - %s\n",errno,strerror(errno));
   }
+end:
+  free(buffer);
 }
 
 static void

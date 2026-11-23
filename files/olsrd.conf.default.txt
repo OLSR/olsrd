@@ -110,6 +110,25 @@
 
 # RtProto 0
 
+# Announce host routes some other software put in the kernel as HNAs, so
+# addresses olsr has no other way of learning about become reachable from
+# the olsr side. The value is the route protocol identifying that software -
+# another routing daemon, a roaming or tunnel manager, anything that
+# installs routes under a protocol of its own. 0 (the default) disables it.
+# Only host routes are taken, so a default route or an aggregate can never
+# turn into an HNA.
+#
+# ImportPrefix, repeatable, bounds what may be announced. Without any, every
+# host route of that protocol is imported - including addresses off transfer
+# networks and management interfaces, so a whitelist is usually what you want.
+#
+# The example imports what protocol 42 installs within one address space:
+#
+# ImportProto 42
+# ImportPrefix 10.12.0.0/16
+
+# ImportProto 0
+
 # Specifies the routing Table olsr uses
 # RtTable is for host routes, RtTableDefault for the route to the default
 # internet gateway (2 in case of IPv6+NIIT) and RtTableTunnel is for

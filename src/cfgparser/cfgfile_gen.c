@@ -482,6 +482,27 @@ void olsrd_write_cnf_autobuf_uncached(struct autobuf *out, struct olsrd_config *
   }
   abuf_appendf(out,
     "\n"
+    "# Route protocol whose host routes are announced as HNAs, so hosts\n"
+    "# only another routing daemon knows about become reachable over olsr.\n"
+    "# 0 disables the import. ImportPrefix, repeatable, bounds what may be\n"
+    "# announced; without any, every host route of that protocol is taken\n"
+    "\n");
+  if (cnf->import_proto != DEF_IMPORTPROTO) {
+    struct ip_prefix_list *hna;
+
+    abuf_appendf(out, "ImportProto %u\n", cnf->import_proto);
+
+    for (hna = cnf->import_prefixes; hna != NULL; hna = hna->next) {
+      struct ipaddr_str addrbuf;
+      abuf_appendf(out, "ImportPrefix %s/%d\n",
+          olsr_ip_to_string(&addrbuf, &hna->net.prefix), hna->net.prefix_len);
+    }
+  } else {
+    abuf_appendf(out, "# ImportProto %u\n", DEF_IMPORTPROTO);
+  }
+
+  abuf_appendf(out,
+    "\n"
     "# Specifies the routing Table olsr uses\n"
     "# RtTable is for host routes, RtTableDefault for the route to the default\n"
     "# internet gateway (2 in case of IPv6+NIIT) and RtTableTunnel is for\n"
